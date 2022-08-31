@@ -20,5 +20,5 @@ class Spaceship : public Sprite {
     void updatePosition(float dt);
     
     // take input from user to move the spaceship
-    void pollInput(float dt);
+    void pollInput(float dt, sf::RenderWindow& window);
 };

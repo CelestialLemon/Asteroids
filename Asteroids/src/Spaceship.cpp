@@ -43,7 +43,7 @@ void Spaceship::updatePosition(float dt) {
 
 // take input to move the ship
 // TODO : normalize the movement vector so as to apply uniform thurst
-void Spaceship::pollInput(float dt) {
+void Spaceship::pollInput(float dt, sf::RenderWindow& window) {
     
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::A))
         m_rigidbody.AddForce(sf::Vector2f(-m_thrust * dt, 0));
