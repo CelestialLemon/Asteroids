@@ -20,6 +20,10 @@ public:
 	void setPosition(sf::Vector2f pos);
 	void setScale(sf::Vector2f scale);
 
+	sf::Color getColor();
+	sf::Vector2f getScale();
+	sf::Vector2f getPosition();
+
 	// Move changes the position of the given GameObject with the given Vector2
 	void Move(sf::Vector2f dir);
 	
