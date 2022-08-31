@@ -18,6 +18,9 @@ class Spaceship : public Sprite {
 
     // update the position of the ship by calculating next position given currentPos and velocity and dt
     void updatePosition(float dt);
+
+    // update the rotation depending on mouse position
+    void updateRotation(float dt, sf::Vector2f mousePosition);
     
     // take input from user to move the spaceship
     void pollInput(float dt, sf::RenderWindow& window);

@@ -41,10 +41,36 @@ void Spaceship::updatePosition(float dt) {
     setPosition(currentPosition);
 }
 
+void Spaceship::updateRotation(float dt, sf::Vector2f mousePosition) {
+    
+    auto playerPosition = getPosition();
+    // set player position to center of sprite
+    playerPosition.x += 32.0f;
+    playerPosition.y += 32.0f;
+
+    // vector pointing from center of player to mouse
+    auto mouseDirection = mousePosition - playerPosition;
+
+    // normalize the direction
+    float magnitude = sqrtf((mouseDirection.x * mouseDirection.x) + (mouseDirection.y * mouseDirection.y));
+    mouseDirection /= magnitude;
+
+    // find angle using x-cord
+    float angle = acosf(mouseDirection.x);
+    // convert angle to deg
+    angle *= (180.0f / 3.14159f);
+
+    // check quadrant
+    if(mouseDirection.y < 0.0f) angle = 360.0f - angle;
+
+    setRotation(angle);
+}
+
 // take input to move the ship
 // TODO : normalize the movement vector so as to apply uniform thurst
 void Spaceship::pollInput(float dt, sf::RenderWindow& window) {
     
+    // position
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::A))
         m_rigidbody.AddForce(sf::Vector2f(-m_thrust * dt, 0));
     
@@ -58,4 +84,8 @@ void Spaceship::pollInput(float dt, sf::RenderWindow& window) {
         m_rigidbody.AddForce(sf::Vector2f(0, m_thrust * dt));
 
     updatePosition(dt);
+
+    // rotation
+    sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
+    updateRotation(dt, (sf::Vector2f)mousePosition);
 }
