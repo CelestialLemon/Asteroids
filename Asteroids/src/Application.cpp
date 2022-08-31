@@ -9,7 +9,7 @@ void Application::Run() {
     
     Sprite sprite_staryBackground;
     sprite_staryBackground.loadTextureFromFile("./res/images/background_01.png");
-    sprite_staryBackground.setPosition(sf::Vector2f(0, 0));
+    sprite_staryBackground.setPosition(sf::Vector2f(360, 360));
     sprite_staryBackground.setColor(sf::Color(255, 255, 255, 150));
 
     Spaceship player;
