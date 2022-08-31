@@ -21,12 +21,6 @@ void Spaceship::updatePosition(float dt) {
     // warp check
     auto currentPosition = getPosition();
 
-    // the currentPosition is of the top-left corner of sprite
-    // adjust position to center of the spaceship sprite, so it warps only when the center of sprite moves offscreen
-    // use the position of this center to calculate warping
-    currentPosition.x += 32.0f;
-    currentPosition.y += 32.0f;
-
     // 720.0f is the height and width of screen in pixels
     currentPosition.x = currentPosition.x < 0.0f ? 720.0f : currentPosition.x;
     currentPosition.x = currentPosition.x > 720.0f ? 0.0f : currentPosition.x;
@@ -34,9 +28,6 @@ void Spaceship::updatePosition(float dt) {
     currentPosition.y = currentPosition.y < 0.0f ? 720.0f : currentPosition.y;
     currentPosition.y = currentPosition.y > 720.0f ? 0.0f : currentPosition.y;
 
-    // cancel the adjustment applied earlier to return to normal
-    currentPosition.x -= 32.0f;
-    currentPosition.y -= 32.0f;
 
     setPosition(currentPosition);
 }
