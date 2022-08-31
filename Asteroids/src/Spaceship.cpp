@@ -10,8 +10,6 @@ void Spaceship::updatePosition(float dt) {
     
     sf::Vector2f currentVelocity = m_rigidbody.GetVelocity();
 
-    float currentSpeed = sqrtf((currentVelocity.x * currentVelocity.x) + (currentVelocity.y * currentVelocity.y));
-
     float dy = currentVelocity.y * dt;
     float dx = currentVelocity.x * dt;
 

@@ -13,7 +13,7 @@ class Rigidbody {
     // the max speed at which the body can travel
     float m_maxSpeed;
 
-    // void clampVelocity();
+    void clampVelocity();
 
     public:
     Rigidbody(int mass, float maxSpeed);
