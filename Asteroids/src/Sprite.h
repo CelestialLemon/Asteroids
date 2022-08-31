@@ -19,10 +19,16 @@ public:
 	void setColor(sf::Color color);
 	void setPosition(sf::Vector2f pos);
 	void setScale(sf::Vector2f scale);
+	// set rotation to given deg
+	void setRotation(float deg);
+
+	// increase the rotation by given deg
+	void rotate(float deg);
 
 	sf::Color getColor();
 	sf::Vector2f getScale();
 	sf::Vector2f getPosition();
+	sf::Vector2f getRotation();
 
 	// Move changes the position of the given GameObject with the given Vector2
 	void Move(sf::Vector2f dir);

@@ -34,6 +34,14 @@ void Sprite::setScale(sf::Vector2f scale) {
     m_sprite.setScale(scale);
 }
 
+void Sprite::setRotation(float deg) {
+    m_sprite.setRotation(deg);
+}
+
+void Sprite::rotate(float deg) {
+    m_sprite.rotate(deg);
+}
+
 sf::Color Sprite::getColor() { return m_sprite.getColor(); }
 sf::Vector2f Sprite::getPosition() { return m_sprite.getPosition(); };
 sf::Vector2f Sprite::getScale() {return m_sprite.getScale(); };
