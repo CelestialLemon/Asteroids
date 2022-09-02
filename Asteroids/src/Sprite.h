@@ -15,6 +15,8 @@ class Sprite {
 
 public:
 	void loadTextureFromFile(const std::string& filepath);
+	// copy loader
+	void setSpriteTexture(const sf::Texture& texture);
 	
 	void setColor(sf::Color color);
 	void setPosition(sf::Vector2f pos);

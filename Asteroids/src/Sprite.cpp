@@ -8,6 +8,12 @@ void Sprite::loadTextureFromFile(const std::string& filepath) {
     m_sprite.setOrigin(sf::Vector2f(m_sprite.getTexture()->getSize().x / 2, m_sprite.getTexture()->getSize().y / 2));
 }
 
+// copy texture from another Texture object, set as sprite
+void Sprite::setSpriteTexture(const sf::Texture& texture) {
+    m_texture = sf::Texture(texture);
+    m_sprite.setTexture(m_texture);
+}
+
 // move the sprite on the screen, works in pixel co-ordinates
 void Sprite::Move(sf::Vector2f dir) {
     auto currentPos = m_sprite.getPosition();
