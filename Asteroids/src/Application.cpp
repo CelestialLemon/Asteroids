@@ -16,7 +16,6 @@ void Application::Run() {
     player.loadTextureFromFile("./res/images/spaceship.png");
     player.setPosition(sf::Vector2f(200, 400));
     
-
     sf::Clock clock;
 
     while (window.isOpen())

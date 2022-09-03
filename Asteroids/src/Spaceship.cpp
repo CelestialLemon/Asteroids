@@ -1,8 +1,9 @@
 #include "Spaceship.h"
+#include "VectorHelper.h"
 
 // initialize the spaceship params
 Spaceship::Spaceship() 
-: m_thrust(300000), m_rigidbody(Rigidbody(4000, 300))
+: m_thrust(600000), m_rigidbody(Rigidbody(4000, 300))
 {}
 
 // update the position of the ship by calculating next position given currentPos and velocity and dt
@@ -41,8 +42,9 @@ void Spaceship::updateRotation(float dt, sf::Vector2f mousePosition) {
     auto mouseDirection = mousePosition - playerPosition;
 
     // normalize the direction
-    float magnitude = sqrtf((mouseDirection.x * mouseDirection.x) + (mouseDirection.y * mouseDirection.y));
-    mouseDirection /= magnitude;
+    mouseDirection = Normalize(mouseDirection);
+    //float magnitude = sqrtf((mouseDirection.x * mouseDirection.x) + (mouseDirection.y * mouseDirection.y));
+    //mouseDirection /= magnitude;
 
     // find angle using x-cord
     float angle = acosf(mouseDirection.x);
