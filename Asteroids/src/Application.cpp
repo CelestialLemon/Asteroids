@@ -1,5 +1,6 @@
 #include "Application.h"
 #include "Spaceship.h"
+#include "Bullet.h"
 
 Application::Application(int resX, int resY) 
     : window(sf::VideoMode(resX, resY), "Asteroids", sf::Style::Close)
@@ -16,9 +17,9 @@ void Application::Run() {
     player.loadTextureFromFile("./res/images/spaceship.png");
     player.setPosition(sf::Vector2f(200, 400));
     
-
     sf::Clock clock;
 
+    int a = 0;
     while (window.isOpen())
     {
         sf::Event event;
@@ -32,15 +33,19 @@ void Application::Run() {
 
         window.clear();
         
-        player.pollInput(dt, window);
+        player.update(dt, window);
         
         // draw here
         // draw in proper order, farthest objects first
         sprite_staryBackground.draw(window);
         player.draw(window);
 
-
-
+        if(a == 1000)
+        { 
+            a= 0;
+            printf("FPS : %.2f\n", 1.0f / dt);
+        }
+        a++;
         window.display();
     }
 }

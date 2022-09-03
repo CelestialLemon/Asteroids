@@ -5,8 +5,17 @@ void Sprite::loadTextureFromFile(const std::string& filepath) {
     m_texture.loadFromFile(filepath);
     m_sprite.setTexture(m_texture);
 
-    m_sprite.setOrigin(sf::Vector2f(m_sprite.getTexture()->getSize().x / 2, m_sprite.getTexture()->getSize().y / 2));
+    m_sprite.setOrigin(sf::Vector2f((float)m_sprite.getTexture()->getSize().x / 2, (float)m_sprite.getTexture()->getSize().y / 2));
 }
+
+// copy texture from another Texture object, set as sprite
+void Sprite::setSpriteTexture(const sf::Texture& texture) {
+    m_texture = sf::Texture(texture);
+    m_sprite.setTexture(m_texture);
+}
+
+// classes that inherit this must provide their own implementation of update
+void Sprite::update(float dt, sf::RenderWindow& window) {}
 
 // move the sprite on the screen, works in pixel co-ordinates
 void Sprite::Move(sf::Vector2f dir) {
@@ -47,3 +56,4 @@ void Sprite::rotate(float deg) {
 sf::Color Sprite::getColor() { return m_sprite.getColor(); }
 sf::Vector2f Sprite::getPosition() { return m_sprite.getPosition(); };
 sf::Vector2f Sprite::getScale() {return m_sprite.getScale(); };
+float Sprite::getRotation() { return m_sprite.getRotation(); }

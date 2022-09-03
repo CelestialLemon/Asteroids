@@ -15,6 +15,8 @@ class Sprite {
 
 public:
 	void loadTextureFromFile(const std::string& filepath);
+	// copy loader
+	void setSpriteTexture(const sf::Texture& texture);
 	
 	void setColor(sf::Color color);
 	void setPosition(sf::Vector2f pos);
@@ -28,7 +30,10 @@ public:
 	sf::Color getColor();
 	sf::Vector2f getScale();
 	sf::Vector2f getPosition();
-	sf::Vector2f getRotation();
+	float getRotation();
+
+	// function is called every frame
+	virtual void update(float dt, sf::RenderWindow& window);
 
 	// Move changes the position of the given GameObject with the given Vector2
 	void Move(sf::Vector2f dir);
