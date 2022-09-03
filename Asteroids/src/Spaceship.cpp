@@ -59,7 +59,7 @@ void Spaceship::updateRotation(float dt, sf::Vector2f mousePosition) {
 
 // take input to move the ship
 // TODO : normalize the movement vector so as to apply uniform thurst
-void Spaceship::pollInput(float dt, sf::RenderWindow& window) {
+void Spaceship::update(float dt, sf::RenderWindow& window) {
     
     // position
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::A))
