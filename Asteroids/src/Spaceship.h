@@ -23,5 +23,5 @@ class Spaceship : public Sprite {
     void updateRotation(float dt, sf::Vector2f mousePosition);
     
     // take input from user to move the spaceship
-    void pollInput(float dt, sf::RenderWindow& window);
+    void update(float dt, sf::RenderWindow& window) override;
 };

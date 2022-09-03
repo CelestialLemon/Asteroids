@@ -31,7 +31,7 @@ void Application::Run() {
 
         window.clear();
         
-        player.pollInput(dt, window);
+        player.update(dt, window);
         
         // draw here
         // draw in proper order, farthest objects first
