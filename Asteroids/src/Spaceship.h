@@ -1,3 +1,5 @@
+#pragma once
+
 #include "Sprite.h"
 #include "Rigidbody.h"
 

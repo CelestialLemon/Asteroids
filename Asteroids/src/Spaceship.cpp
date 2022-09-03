@@ -1,5 +1,4 @@
 #include "Spaceship.h"
-#include "VectorHelper.h"
 
 // initialize the spaceship params
 Spaceship::Spaceship() 
@@ -42,7 +41,10 @@ void Spaceship::updateRotation(float dt, sf::Vector2f mousePosition) {
     auto mouseDirection = mousePosition - playerPosition;
 
     // normalize the direction
-    mouseDirection = Normalize(mouseDirection);
+    float magnitude = sqrtf((mouseDirection.x * mouseDirection.x) + (mouseDirection.y * mouseDirection.y));
+    
+    mouseDirection.x /= magnitude;
+    mouseDirection.y /= magnitude;
     //float magnitude = sqrtf((mouseDirection.x * mouseDirection.x) + (mouseDirection.y * mouseDirection.y));
     //mouseDirection /= magnitude;
 

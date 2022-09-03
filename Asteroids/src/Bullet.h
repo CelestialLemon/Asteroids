@@ -14,5 +14,6 @@ class Bullet : public Sprite {
     // fire bullet from pos towards dir
     Bullet(sf::Vector2f pos, sf::Vector2f dir, const sf::Texture& bulletTexture);
 
-    void updatePosition();
+    void updatePosition(float dt);
+    void update(float dt, sf::RenderWindow& window) override;
 };

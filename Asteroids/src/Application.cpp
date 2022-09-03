@@ -1,5 +1,6 @@
 #include "Application.h"
 #include "Spaceship.h"
+#include "Bullet.h"
 
 Application::Application(int resX, int resY) 
     : window(sf::VideoMode(resX, resY), "Asteroids", sf::Style::Close)
@@ -37,7 +38,6 @@ void Application::Run() {
         // draw in proper order, farthest objects first
         sprite_staryBackground.draw(window);
         player.draw(window);
-
 
 
         window.display();
