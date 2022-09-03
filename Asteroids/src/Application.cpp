@@ -19,7 +19,6 @@ void Application::Run() {
     
     sf::Clock clock;
 
-    int a = 0;
     while (window.isOpen())
     {
         sf::Event event;
@@ -40,12 +39,6 @@ void Application::Run() {
         sprite_staryBackground.draw(window);
         player.draw(window);
 
-        if(a == 1000)
-        { 
-            a= 0;
-            printf("FPS : %.2f\n", 1.0f / dt);
-        }
-        a++;
         window.display();
     }
 }
