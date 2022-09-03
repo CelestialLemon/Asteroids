@@ -14,6 +14,9 @@ void Sprite::setSpriteTexture(const sf::Texture& texture) {
     m_sprite.setTexture(m_texture);
 }
 
+// classes that inherit this must provide their own implementation of update
+void Sprite::update() {}
+
 // move the sprite on the screen, works in pixel co-ordinates
 void Sprite::Move(sf::Vector2f dir) {
     auto currentPos = m_sprite.getPosition();

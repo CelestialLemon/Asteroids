@@ -32,6 +32,9 @@ public:
 	sf::Vector2f getPosition();
 	sf::Vector2f getRotation();
 
+	// function is called every frame
+	virtual void update();
+
 	// Move changes the position of the given GameObject with the given Vector2
 	void Move(sf::Vector2f dir);
 	
