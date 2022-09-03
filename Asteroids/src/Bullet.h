@@ -14,6 +14,12 @@ class Bullet : public Sprite {
     // fire bullet from pos towards dir
     Bullet(sf::Vector2f pos, sf::Vector2f dir, const sf::Texture& bulletTexture);
 
+    // update sprite position depending on current velocity, must be called every frame
     void updatePosition(float dt);
+
+    // for polling input, running physics etc etc, must be called every frame
     void update(float dt, sf::RenderWindow& window) override;
+
+    // checks if the bullet is in the playing area of the field
+    bool isInBounds();
 };

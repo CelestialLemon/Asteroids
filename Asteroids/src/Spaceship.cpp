@@ -2,7 +2,7 @@
 
 // initialize the spaceship params
 Spaceship::Spaceship() 
-: m_thrust(600000), m_rigidbody(Rigidbody(4000, 300)), gunMaxCharge(100), gunRechargeSpeed(250), gunCurrentCharge(0.0f)
+: m_thrust(600000), m_rigidbody(Rigidbody(4000, 300)), gunMaxCharge(100), gunRechargeSpeed(500), gunCurrentCharge(0.0f)
 {
     m_bulletTexture.loadFromFile("./res/images/bullet.png");
 }
@@ -63,23 +63,29 @@ void Spaceship::updateRotation(float dt, sf::Vector2f mousePosition) {
 
 void Spaceship::Fire() {
 
+    // if gun reaches max charge fire
     if(gunCurrentCharge >= (float)gunMaxCharge) {
 
+        // get position of spaceship
         sf::Vector2f fireFrom = getPosition();
 
+        // distance from center of spaceship to its front tip
         float distanceFromCenter = 20.0f;
 
         float dy = distanceFromCenter * sinf(getRotation() * 3.14159f / 180.0f); 
         float dx = distanceFromCenter * cosf(getRotation() * 3.14159f / 180.0f); 
 
+        // add some displacement in the forward direction so bullet is fired from tip of plane
         fireFrom += sf::Vector2f(dx, dy);
+
+        // create new bullet
         Bullet* b = new Bullet(fireFrom, sf::Vector2f(dx, dy), m_bulletTexture);
 
-        m_bullets.push_back(b);
+        // add new bullet to the map of bullets
+        m_bullets[b] = b;
 
+        // reset gun charge
         gunCurrentCharge = 0;
-
-        printf("fired\n");
     }
 }
 
@@ -108,14 +114,33 @@ void Spaceship::update(float dt, sf::RenderWindow& window) {
 
     // fire code
     
+    // increase the charge of gun every frame depending on rechargeSpeed
     gunCurrentCharge += (float)gunRechargeSpeed * dt;
+
+    // if already at maxCharge dont increase
     gunCurrentCharge = gunCurrentCharge > gunMaxCharge ? gunMaxCharge : gunCurrentCharge;
 
+    // if pressed button, fire
     if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) 
         Fire();
 
+    // update positions of bullets and draw them to screen
+    
+    // also check which bullets went out bound and have to be deleted
+    // save their addresses in toDelete array, we will delete them after updating all, else it will mess up the foreach loop
+
+    std::vector<Bullet*> toDelete;
+    
     for(auto bullet : m_bullets) {
-        bullet->update(dt, window);
-        bullet->draw(window);
+        bullet.second->update(dt, window);
+        bullet.second->draw(window);
+
+        if(!bullet.second->isInBounds()) toDelete.push_back(bullet.first);
+    }
+
+    // remove the outofbound bullets from map and delete them
+    for(auto bullet : toDelete) {
+        m_bullets.erase(bullet);
+        delete(bullet);
     }
 }

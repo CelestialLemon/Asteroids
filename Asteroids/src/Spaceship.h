@@ -6,6 +6,7 @@
 
 #include <SFML/Graphics.hpp>
 #include <vector>
+#include <unordered_map>
 
 // The player class
 // Inherits from Sprite because it has a sprite
@@ -19,11 +20,14 @@ class Spaceship : public Sprite {
 
     // holds the texture of bullets, for creating new one
     sf::Texture m_bulletTexture;
-    std::vector<Bullet*> m_bullets;
-    //
+    //std::vector<Bullet*> m_bullets;
+    std::unordered_map<Bullet*, Bullet*> m_bullets;
+    
+    // gun has charge level, increases every second by given speed, fires when reaching maxcharge
     int gunMaxCharge, gunRechargeSpeed;
     float gunCurrentCharge;
 
+    // fire bullets if reached max charge
     void Fire();
 
     public:

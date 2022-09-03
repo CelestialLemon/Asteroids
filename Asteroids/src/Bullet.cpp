@@ -4,7 +4,7 @@ Bullet::Bullet()
 : m_rb(Rigidbody(20, 1000)), m_fireForce(2000) {}
 
 Bullet::Bullet(sf::Vector2f pos, sf::Vector2f dir, const sf::Texture& bulletTexture)
-: m_rb(Rigidbody(20, 1000)), m_fireForce(10000)
+: m_rb(Rigidbody(20, 1000)), m_fireForce(50000)
 {
     setSpriteTexture(bulletTexture);
     setPosition(pos);
@@ -29,7 +29,18 @@ void Bullet::updatePosition(float dt) {
     Move(sf::Vector2f(dx, dy));
 }
 
+// bullets only need update position
 void Bullet::update(float dt, sf::RenderWindow& window) {
     updatePosition(dt);
+}
+
+// returns true if the bullet is in playing area
+bool Bullet::isInBounds() {
+    auto currentPosition = getPosition();
+
+    if(currentPosition.x < 0 || currentPosition.x > 720) return false;
+    if(currentPosition.y < 0 || currentPosition.y > 720) return false;
+
+    return true;
 }
 
