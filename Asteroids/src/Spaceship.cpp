@@ -2,8 +2,10 @@
 
 // initialize the spaceship params
 Spaceship::Spaceship() 
-: m_thrust(600000), m_rigidbody(Rigidbody(4000, 300))
-{}
+: m_thrust(600000), m_rigidbody(Rigidbody(4000, 300)), gunMaxCharge(100), gunRechargeSpeed(250), gunCurrentCharge(0.0f)
+{
+    m_bulletTexture.loadFromFile("./res/images/bullet.png");
+}
 
 // update the position of the ship by calculating next position given currentPos and velocity and dt
 void Spaceship::updatePosition(float dt) {
@@ -34,8 +36,8 @@ void Spaceship::updateRotation(float dt, sf::Vector2f mousePosition) {
     
     auto playerPosition = getPosition();
     // set player position to center of sprite
-    playerPosition.x += 32.0f;
-    playerPosition.y += 32.0f;
+    //playerPosition.x += 32.0f;
+    //playerPosition.y += 32.0f;
 
     // vector pointing from center of player to mouse
     auto mouseDirection = mousePosition - playerPosition;
@@ -57,6 +59,28 @@ void Spaceship::updateRotation(float dt, sf::Vector2f mousePosition) {
     if(mouseDirection.y < 0.0f) angle = 360.0f - angle;
 
     setRotation(angle);
+}
+
+void Spaceship::Fire() {
+
+    if(gunCurrentCharge >= (float)gunMaxCharge) {
+
+        sf::Vector2f fireFrom = getPosition();
+
+        float distanceFromCenter = 20.0f;
+
+        float dy = distanceFromCenter * sinf(getRotation() * 3.14159f / 180.0f); 
+        float dx = distanceFromCenter * cosf(getRotation() * 3.14159f / 180.0f); 
+
+        fireFrom += sf::Vector2f(dx, dy);
+        Bullet* b = new Bullet(fireFrom, sf::Vector2f(dx, dy), m_bulletTexture);
+
+        m_bullets.push_back(b);
+
+        gunCurrentCharge = 0;
+
+        printf("fired\n");
+    }
 }
 
 // take input to move the ship
@@ -81,4 +105,17 @@ void Spaceship::update(float dt, sf::RenderWindow& window) {
     // rotation
     sf::Vector2i mousePosition = sf::Mouse::getPosition(window);
     updateRotation(dt, (sf::Vector2f)mousePosition);
+
+    // fire code
+    
+    gunCurrentCharge += (float)gunRechargeSpeed * dt;
+    gunCurrentCharge = gunCurrentCharge > gunMaxCharge ? gunMaxCharge : gunCurrentCharge;
+
+    if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) 
+        Fire();
+
+    for(auto bullet : m_bullets) {
+        bullet->update(dt, window);
+        bullet->draw(window);
+    }
 }

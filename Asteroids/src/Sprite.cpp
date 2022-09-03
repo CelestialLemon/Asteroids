@@ -56,3 +56,4 @@ void Sprite::rotate(float deg) {
 sf::Color Sprite::getColor() { return m_sprite.getColor(); }
 sf::Vector2f Sprite::getPosition() { return m_sprite.getPosition(); };
 sf::Vector2f Sprite::getScale() {return m_sprite.getScale(); };
+float Sprite::getRotation() { return m_sprite.getRotation(); }

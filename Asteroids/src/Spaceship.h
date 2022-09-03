@@ -2,8 +2,10 @@
 
 #include "Sprite.h"
 #include "Rigidbody.h"
+#include "Bullet.h"
 
 #include <SFML/Graphics.hpp>
+#include <vector>
 
 // The player class
 // Inherits from Sprite because it has a sprite
@@ -14,6 +16,15 @@ class Spaceship : public Sprite {
     
     // amount of force applied to the rigidbody per second
     float m_thrust;
+
+    // holds the texture of bullets, for creating new one
+    sf::Texture m_bulletTexture;
+    std::vector<Bullet*> m_bullets;
+    //
+    int gunMaxCharge, gunRechargeSpeed;
+    float gunCurrentCharge;
+
+    void Fire();
 
     public:
     Spaceship();

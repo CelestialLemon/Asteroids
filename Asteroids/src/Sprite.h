@@ -30,7 +30,7 @@ public:
 	sf::Color getColor();
 	sf::Vector2f getScale();
 	sf::Vector2f getPosition();
-	sf::Vector2f getRotation();
+	float getRotation();
 
 	// function is called every frame
 	virtual void update(float dt, sf::RenderWindow& window);
