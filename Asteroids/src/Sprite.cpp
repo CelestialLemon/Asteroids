@@ -57,3 +57,8 @@ sf::Color Sprite::getColor() { return m_sprite.getColor(); }
 sf::Vector2f Sprite::getPosition() { return m_sprite.getPosition(); };
 sf::Vector2f Sprite::getScale() {return m_sprite.getScale(); };
 float Sprite::getRotation() { return m_sprite.getRotation(); }
+sf::FloatRect Sprite::getGlobalBounds() { return m_sprite.getGlobalBounds(); }
+sf::Vector2f Sprite::getOrigin() { return m_sprite.getOrigin(); }
+sf::Vector2f Sprite::getDimmensions() { 
+    return sf::Vector2f(m_sprite.getTexture()->getSize().x, m_sprite.getTexture()->getSize().y); 
+}

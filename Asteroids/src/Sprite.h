@@ -31,6 +31,9 @@ public:
 	sf::Vector2f getScale();
 	sf::Vector2f getPosition();
 	float getRotation();
+	sf::FloatRect getGlobalBounds();
+	sf::Vector2f getOrigin();
+	sf::Vector2f getDimmensions();
 
 	// function is called every frame
 	virtual void update(float dt, sf::RenderWindow& window);
