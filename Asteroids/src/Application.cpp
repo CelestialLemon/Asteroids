@@ -31,11 +31,14 @@ void Application::Run() {
     player.loadTextureFromFile("./res/images/spaceship.png");
     player.setPosition(sf::Vector2f(200, 400));
 
-    Asteroid asteroid1(100, 100, 50);
-    asteroid1.SetPosition(sf::Vector2f(400, 200));
-    
-    sf::Clock clock;
+    // holds all the instantiated asteroids in the scene
+    std::unordered_map<Asteroid*, Asteroid*> asteroids;
 
+    // spawn an asteroid every 0.5 seconds
+    const float spawnSpeed = 1.0f;
+    float timeSinceLastAsteroidSpawn = spawnSpeed;
+   
+    sf::Clock clock;
     while (window.isOpen())
     {
         sf::Event event;
@@ -52,22 +55,39 @@ void Application::Run() {
 
         float dt = clock.restart().asSeconds();
 
-        window.clear();
-        
-        player.update(dt, window);
-        asteroid1.update(dt);
+        if(timeSinceLastAsteroidSpawn >= spawnSpeed) {
+            Asteroid* a = new Asteroid(rand() % 50 + 50, 100, rand() % 10 + 10);
+            asteroids[a] = a;
 
+            timeSinceLastAsteroidSpawn = 0;
+        }
+        else timeSinceLastAsteroidSpawn += dt;
+
+        window.clear();
+        player.update(dt, window);
+        
+        for(auto asteroid : asteroids) asteroid.second->update(dt);
         
         // draw here
         // draw in proper order, farthest objects first
         sprite_staryBackground.draw(window);
+        for(auto asteroid : asteroids) asteroid.second->draw(window);
         player.draw(window);
-        asteroid1.draw(window);
-
         // auto bounds = player.getGlobalBounds();
         // printf("Bounds, left: %.2f, top: %.2f\n", bounds.left, bounds.top);
         //window.draw(asteroid);
 
         window.display();
+
+        std::vector<Asteroid*> toDelete;
+
+        for(auto asteroid : asteroids) {
+            if(!asteroid.second->isInBounds()) toDelete.push_back(asteroid.second);
+        }
+
+        for(auto toDeleteAsteroid: toDelete) {
+            asteroids.erase(toDeleteAsteroid);
+            delete(toDeleteAsteroid);
+        }
     }
 }
