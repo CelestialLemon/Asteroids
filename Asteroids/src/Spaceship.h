@@ -2,6 +2,7 @@
 
 #include "Sprite.h"
 #include "Rigidbody.h"
+#include "Asteroid.h"
 #include "Bullet.h"
 
 #include <SFML/Graphics.hpp>
@@ -33,6 +34,8 @@ class Spaceship : public Sprite {
 
     public:
     Spaceship();
+
+    void AsteroidBulletCollision(const std::unordered_set<Asteroid*>& asteroids);
 
     // update the position of the ship by calculating next position given currentPos and velocity and dt
     void updatePosition(float dt);

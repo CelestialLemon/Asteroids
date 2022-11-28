@@ -122,6 +122,51 @@ void Asteroid::Hurl() {
     m_rigidbody.AddForce(forceDir);
 }
 
+float operator* (sf::Vector2f left, sf::Vector2f right) {
+    return (left.x * right.x) + (left.y * right.y);
+}
+
+bool pointTriangleIntersection(sf::Vector2f p, sf::Vector2f a, sf::Vector2f b, sf::Vector2f c) {
+    
+    bool b0 = (sf::Vector2f(p.x - a.x, p.y - a.y) * sf::Vector2f(a.y - b.y, b.x - a.x) > 0);
+    bool b1 = (sf::Vector2f(p.x - b.x, p.y - b.y) * sf::Vector2f(b.y - c.y, c.x - b.x) > 0);
+    bool b2 = (sf::Vector2f(p.x - c.x, p.y - c.y) * sf::Vector2f(c.y - a.y, a.x - c.x) > 0);
+
+    return (b0 == b1 && b1 == b2);
+}
+
+bool Asteroid::IsPointInside(sf::Vector2f point) {
+
+    int nPoints = m_asteroidShape.getPointCount();
+
+    for(int i = 0; i < nPoints - 1; i++) {
+        sf::Vector2f pointA = m_asteroidShape.getPoint(i) + m_asteroidShape.getPosition();
+        sf::Vector2f pointB = m_asteroidShape.getPoint(i + 1) + m_asteroidShape.getPosition();
+        sf::Vector2f pointC = m_asteroidShape.getPosition();
+
+        bool isInTriangle = pointTriangleIntersection(point, pointA, pointB, pointC);
+
+        if(isInTriangle) return true;
+    }
+
+    sf::Vector2f pointA = m_asteroidShape.getPoint(nPoints - 1) + m_asteroidShape.getPosition();
+    sf::Vector2f pointB = m_asteroidShape.getPoint(0) + m_asteroidShape.getPosition();
+    sf::Vector2f pointC = m_asteroidShape.getPosition();
+
+    bool isInTriangle = pointTriangleIntersection(point, pointA, pointB, pointC);
+
+    if(isInTriangle) return true;
+    else return false;
+}
+
+void Asteroid::Hit(float damage) {
+    m_currentHitpoints -= damage;
+}
+
+float Asteroid::GetHitpoints() {
+    return m_currentHitpoints;
+}
+
 void Asteroid::updatePosition(float dt) {
     auto currentVelocity = m_rigidbody.GetVelocity();
 

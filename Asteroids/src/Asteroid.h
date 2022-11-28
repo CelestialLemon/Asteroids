@@ -1,6 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include <unordered_set>
 #include "Rigidbody.h"
 
 class Asteroid {
@@ -43,6 +44,11 @@ class Asteroid {
     // draw the convex shape of the asteroid to given window
     void draw(sf::RenderWindow& window);
 
+    bool IsPointInside(sf::Vector2f point);
+
+    void Hit(float damage);
+
+    float GetHitpoints();
     // returns if the asteroids is the permitted bounds or not
     bool isInBounds();
 
