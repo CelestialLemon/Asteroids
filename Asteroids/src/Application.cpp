@@ -32,7 +32,7 @@ void Application::Run() {
     player.setPosition(sf::Vector2f(200, 400));
 
     // holds all the instantiated asteroids in the scene
-    std::unordered_map<Asteroid*, Asteroid*> asteroids;
+    std::unordered_set<Asteroid*> asteroids;
 
     // spawn an asteroid every 0.5 seconds
     const float spawnSpeed = 1.0f;
@@ -57,7 +57,7 @@ void Application::Run() {
 
         if(timeSinceLastAsteroidSpawn >= spawnSpeed) {
             Asteroid* a = new Asteroid(rand() % 50 + 50, 100, rand() % 10 + 10);
-            asteroids[a] = a;
+            asteroids.insert(a);
 
             timeSinceLastAsteroidSpawn = 0;
         }
@@ -66,12 +66,12 @@ void Application::Run() {
         window.clear();
         player.update(dt, window);
         
-        for(auto asteroid : asteroids) asteroid.second->update(dt);
+        for(auto asteroid : asteroids) asteroid->update(dt);
         
         // draw here
         // draw in proper order, farthest objects first
         sprite_staryBackground.draw(window);
-        for(auto asteroid : asteroids) asteroid.second->draw(window);
+        for(auto asteroid : asteroids) asteroid->draw(window);
         player.draw(window);
         // auto bounds = player.getGlobalBounds();
         // printf("Bounds, left: %.2f, top: %.2f\n", bounds.left, bounds.top);
@@ -82,7 +82,7 @@ void Application::Run() {
         std::vector<Asteroid*> toDelete;
 
         for(auto asteroid : asteroids) {
-            if(!asteroid.second->isInBounds()) toDelete.push_back(asteroid.second);
+            if(!asteroid->isInBounds()) toDelete.push_back(asteroid);
         }
 
         for(auto toDeleteAsteroid: toDelete) {

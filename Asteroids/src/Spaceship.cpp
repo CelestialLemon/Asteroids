@@ -82,7 +82,7 @@ void Spaceship::Fire() {
         Bullet* b = new Bullet(fireFrom, sf::Vector2f(dx, dy), m_bulletTexture);
 
         // add new bullet to the map of bullets
-        m_bullets[b] = b;
+        m_bullets.insert(b);
 
         // reset gun charge
         gunCurrentCharge = 0;
@@ -132,10 +132,10 @@ void Spaceship::update(float dt, sf::RenderWindow& window) {
     std::vector<Bullet*> toDelete;
     
     for(auto bullet : m_bullets) {
-        bullet.second->update(dt, window);
-        bullet.second->draw(window);
+        bullet->update(dt, window);
+        bullet->draw(window);
 
-        if(!bullet.second->isInBounds()) toDelete.push_back(bullet.first);
+        if(!bullet->isInBounds()) toDelete.push_back(bullet);
     }
 
     // remove the outofbound bullets from map and delete them
