@@ -4,10 +4,18 @@
 #include <unordered_set>
 #include "Rigidbody.h"
 
+enum AsteroidSize {
+    SMALL = 0,
+    MEDIUM = 1,
+    LARGE = 2
+};
+
 class Asteroid {
 
     // convex shape of the asteroids that is also the sprite for the object
     sf::ConvexShape m_asteroidShape;
+
+    AsteroidSize m_asteroidSize;
 
     // radius which will be used while randomly generating vertices for the convex shape of asteroid
     float m_radius;
@@ -36,7 +44,7 @@ class Asteroid {
     Asteroid();
 
     // parameterized contructors for setting custom values of following properties
-    Asteroid(float radius, float maxHitpoints, int nPoints);
+    Asteroid(AsteroidSize asteroidSize);
 
     // explicitly set the position of asteroid, should only be set when a new asteroid is instantiated
     void SetPosition(sf::Vector2f position);

@@ -1,4 +1,5 @@
 #include "Asteroid.h"
+#include <iostream>
 
 static float randomFloat() {
     // returns random float between 0.5 and 0.99
@@ -23,6 +24,9 @@ m_radius(50),
 m_currentHitpoints(100), 
 m_maxHitpoints(100),
 
+// default size for asteroid is large
+m_asteroidSize(AsteroidSize::LARGE),
+
 // mass is directly proportional to hitpoints i.e mass = 1000 * hitpoints, and maxspeed for asteroid is 500
 m_rigidbody(Rigidbody(100 * 1000, 500))
 {
@@ -40,14 +44,33 @@ m_rigidbody(Rigidbody(100 * 1000, 500))
 }
 
 // parameterized contructor, same as default execpt for user defined values
-Asteroid::Asteroid(float radius, float maxHitpoints, int nPoints) : 
-m_radius(radius), 
-m_currentHitpoints(maxHitpoints),
-m_maxHitpoints(maxHitpoints),
+Asteroid::Asteroid(AsteroidSize asteroidSize) : 
+m_asteroidSize(asteroidSize)
 // mass of the asteroid is directly propertional to its maximum hitpoints
-m_rigidbody(Rigidbody(maxHitpoints * 1000, 500))
 {
+    // number of points in the polygon of the asteroid
+    int nPoints = 0;
     // TODO : change asteroid border thickness by its hitpoints
+    if(asteroidSize == AsteroidSize::SMALL) {
+        m_radius = rand() % 25 + 25;
+        nPoints = rand() % 5 + 5;
+    }
+    else if(asteroidSize == AsteroidSize::MEDIUM) {
+        m_radius = rand() % 25 + 50;
+        nPoints = rand() % 5 + 10;
+    }
+    else {
+        // asteroidSize == AsteroidSize::LARGE
+        m_radius = rand() % 25 + 75;
+        nPoints = rand() % 5 + 15;
+    }
+
+    // the larger that asteroid radius the greater its health
+    // will add some multiplier here for balancing
+    m_maxHitpoints = m_radius;
+    m_currentHitpoints = m_radius;
+    m_rigidbody = Rigidbody(m_maxHitpoints * 1000, 500);
+    std::cout << "hitpoints: " << m_maxHitpoints << '\n';
     m_asteroidShape.setPointCount(nPoints);
     SetPoints();
     

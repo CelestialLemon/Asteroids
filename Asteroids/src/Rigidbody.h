@@ -16,6 +16,7 @@ class Rigidbody {
     void clampVelocity();
 
     public:
+    Rigidbody();
     Rigidbody(int mass, float maxSpeed);
 
     // add external force to the body to influence its velocity

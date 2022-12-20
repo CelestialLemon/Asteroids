@@ -148,19 +148,26 @@ void Spaceship::update(float dt, sf::RenderWindow& window) {
 
 void Spaceship::AsteroidBulletCollision(const std::unordered_set<Asteroid*>& asteroids) {
 
+    // container to store reference to bullets that have hit an asteroid
     std::vector<Bullet*> bullets_hit;
+
     for(auto bullet : m_bullets) {
         for(auto asteroid : asteroids) {
+            // check if the bullet is inside asteroid
             bool hasBulletHit = asteroid->IsPointInside(bullet->getPosition());
 
             if(hasBulletHit) {
+                // if hit, add to container
                 bullets_hit.push_back(bullet);
-                asteroid->Hit(100);
+
+                // reduce asteroid hitpoints
+                asteroid->Hit(40);
                 break;
             }
         }
     }
 
+    // delete bullets that have hit an asteroid
     for(auto bullet : bullets_hit) {
         m_bullets.erase(bullet);
         delete(bullet);

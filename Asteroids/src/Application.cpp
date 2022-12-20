@@ -43,7 +43,17 @@ void Application::Run() {
         float dt = clock.restart().asSeconds();
 
         if(timeSinceLastAsteroidSpawn >= spawnSpeed) {
-            Asteroid* a = new Asteroid(rand() % 50 + 50, 100, rand() % 10 + 10);
+            
+            // get a random number from 0-2 for spawning asteroid
+            int randAsteroidSize = rand() % 3;
+
+            Asteroid* a = nullptr;
+
+            // all 3 sizes have same probabilty of spawning
+            if(randAsteroidSize == 0) a = new Asteroid(AsteroidSize::SMALL);
+            else if(randAsteroidSize == 1) a = new Asteroid(AsteroidSize::MEDIUM);
+            else if(randAsteroidSize == 2) a = new Asteroid(AsteroidSize::LARGE);
+
             asteroids.insert(a);
 
             timeSinceLastAsteroidSpawn = 0;

@@ -1,5 +1,10 @@
 #include "Rigidbody.h"
 
+Rigidbody::Rigidbody()
+: m_mass(1), m_maxSpeed(1) {
+    m_velocity = sf::Vector2f(0, 0);
+}
+
 // initialize params, set initial speed to zero
 Rigidbody::Rigidbody(int mass, float maxSpeed)
 : m_mass(mass), m_maxSpeed(maxSpeed) {
