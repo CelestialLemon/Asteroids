@@ -2,6 +2,14 @@
 #include "Spaceship.h"
 #include "Bullet.h"
 #include "Asteroid.h"
+#include <iostream>
+
+static void normalize(sf::Vector2f& vec) {
+    float magnitude = sqrtf((vec.x * vec.x) + (vec.y * vec.y));
+
+    vec.x /= magnitude;
+    vec.y /= magnitude;
+}
 
 Application::Application(int resX, int resY) 
     : window(sf::VideoMode(resX, resY), "Asteroids", sf::Style::Close)
@@ -13,7 +21,6 @@ void Application::Run() {
     sprite_staryBackground.loadTextureFromFile("./res/images/background_01.png");
     sprite_staryBackground.setPosition(sf::Vector2f(360, 360));
     sprite_staryBackground.setColor(sf::Color(255, 255, 255, 150));
-
     Spaceship player;
     player.loadTextureFromFile("./res/images/spaceship.png");
     player.setPosition(sf::Vector2f(200, 400));
@@ -78,10 +85,49 @@ void Application::Run() {
         window.display();
 
         std::vector<Asteroid*> toDelete;
+        std::vector<Asteroid*> toAdd;
 
         for(auto asteroid : asteroids) {
             if(!asteroid->isInBounds()) toDelete.push_back(asteroid);
-            if(asteroid->GetHitpoints() <= 0) toDelete.push_back(asteroid);
+            if(asteroid->GetHitpoints() <= 0) {
+                toDelete.push_back(asteroid);
+                if(asteroid->GetAsteroidSize() == AsteroidSize::LARGE) {
+                    sf::Vector2f asteroidVelocity = asteroid->GetVelocity();
+                    normalize(asteroidVelocity);
+
+                    float velocityAngle = 0.0f;
+
+                    if(asteroidVelocity.x > 0 && asteroidVelocity.y > 0) {
+                        // first quadrant
+                        velocityAngle = asin(asteroidVelocity.y);
+                    }
+                    else if(asteroidVelocity.x < 0 && asteroidVelocity.y > 0) {
+                        // second quadrant
+                        velocityAngle = 3.14159f - asin(asteroidVelocity.y);
+                    }
+                    else if(asteroidVelocity.x < 0 && asteroidVelocity.y < 0) {
+                        // thrid quadrant
+                        velocityAngle = 3.14159 - asin(asteroidVelocity.y);
+                    }
+                    else {
+                        // fourth quadrant
+                        velocityAngle = 2 * 3.14159 + asin(asteroidVelocity.y);
+                    }
+
+                    sf::Vector2f directionToHurl1(cos(velocityAngle + 0.15), sin(velocityAngle + 0.15));
+                    Asteroid* b = new Asteroid(asteroid->GetPosition(), AsteroidSize::SMALL, asteroid->GetPosition() + directionToHurl1);
+
+                    sf::Vector2f directionToHurl2(cos(velocityAngle - 0.15), sin(velocityAngle - 0.15));
+                    Asteroid* c = new Asteroid(asteroid->GetPosition(), AsteroidSize::SMALL, asteroid->GetPosition() + directionToHurl2);
+
+                    asteroids.insert(b); 
+                    asteroids.insert(c); 
+                }
+            }
+        }
+
+        for(auto asteroid : toAdd) {
+            asteroids.insert(asteroid);
         }
 
         for(auto toDeleteAsteroid: toDelete) {

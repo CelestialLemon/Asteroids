@@ -67,6 +67,6 @@ void Rigidbody::AddForce(sf::Vector2f force) {
 }
 
 // return current velocity of the body
-sf::Vector2f Rigidbody::GetVelocity() {
+sf::Vector2f Rigidbody::GetVelocity() const {
     return m_velocity;
 }
