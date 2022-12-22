@@ -87,7 +87,6 @@ m_asteroidSize(asteroidSize)
     m_maxHitpoints = m_radius;
     m_currentHitpoints = m_radius;
     m_rigidbody = Rigidbody(m_maxHitpoints * 1000, 500);
-    std::cout << "hitpoints: " << m_maxHitpoints << '\n';
     m_asteroidShape.setPointCount(nPoints);
     SetPoints();
     

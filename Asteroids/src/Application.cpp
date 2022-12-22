@@ -11,6 +11,29 @@ static void normalize(sf::Vector2f& vec) {
     vec.y /= magnitude;
 }
 
+static float cartesianAngle(const sf::Vector2f& vec) {
+    float angle = 0.0f;
+
+    if(vec.x > 0 && vec.y > 0) {
+        // first quadrant
+        angle = asin(vec.y);
+    }
+    else if(vec.x < 0 && vec.y > 0) {
+        // second quadrant
+        angle = 3.14159f - asin(vec.y);
+    }
+    else if(vec.x < 0 && vec.y < 0) {
+        // thrid quadrant
+        angle = 3.14159 - asin(vec.y);
+    }
+    else {
+        // fourth quadrant
+        angle = 2 * 3.14159 + asin(vec.y);
+    }
+
+    return angle;
+}
+
 Application::Application(int resX, int resY) 
     : window(sf::VideoMode(resX, resY), "Asteroids", sf::Style::Close)
 { srand(time(0)); }
@@ -23,12 +46,13 @@ void Application::Run() {
     sprite_staryBackground.setColor(sf::Color(255, 255, 255, 150));
     Spaceship player;
     player.loadTextureFromFile("./res/images/spaceship.png");
-    player.setPosition(sf::Vector2f(200, 400));
+    player.setPosition(sf::Vector2f(360, 360));
 
     // holds all the instantiated asteroids in the scene
     std::unordered_set<Asteroid*> asteroids;
+    int nAsteroidsDestroyed = 0;
 
-    // spawn an asteroid every 0.5 seconds
+    // spawn an asteroid every 1.0f seconds
     const float spawnSpeed = 1.0f;
     float timeSinceLastAsteroidSpawn = spawnSpeed;
    
@@ -69,6 +93,9 @@ void Application::Run() {
 
         window.clear();
         player.update(dt, window);
+
+        // loops through asteroids and bullets to check if any have collided
+        // if they have collided reduces the hitpoints of the asteroid hit, and destroyes the bullet that hit
         player.AsteroidBulletCollision(asteroids);
         
         for(auto asteroid : asteroids) asteroid->update(dt);
@@ -88,39 +115,33 @@ void Application::Run() {
         std::vector<Asteroid*> toAdd;
 
         for(auto asteroid : asteroids) {
+            // if asteroid has gone outside the game permitted bounds we need to destroy it
             if(!asteroid->isInBounds()) toDelete.push_back(asteroid);
+
+            // if asteroid has reached 0 hitpoints, we need to destroy it
             if(asteroid->GetHitpoints() <= 0) {
                 toDelete.push_back(asteroid);
+                nAsteroidsDestroyed++;
+                std::cout << nAsteroidsDestroyed << '\n';
+                // if a large asteroid was destroyed by reaching 0 hitpoints, spawn 2 small ones
                 if(asteroid->GetAsteroidSize() == AsteroidSize::LARGE) {
+
+                    // get velocity of parent asteroid
+                    // used to hurl child asteroids in proper direction
                     sf::Vector2f asteroidVelocity = asteroid->GetVelocity();
                     normalize(asteroidVelocity);
 
-                    float velocityAngle = 0.0f;
+                    // find the cartesian angle of given velocity in radians
+                    float velocityAngle = cartesianAngle(asteroidVelocity);
 
-                    if(asteroidVelocity.x > 0 && asteroidVelocity.y > 0) {
-                        // first quadrant
-                        velocityAngle = asin(asteroidVelocity.y);
-                    }
-                    else if(asteroidVelocity.x < 0 && asteroidVelocity.y > 0) {
-                        // second quadrant
-                        velocityAngle = 3.14159f - asin(asteroidVelocity.y);
-                    }
-                    else if(asteroidVelocity.x < 0 && asteroidVelocity.y < 0) {
-                        // thrid quadrant
-                        velocityAngle = 3.14159 - asin(asteroidVelocity.y);
-                    }
-                    else {
-                        // fourth quadrant
-                        velocityAngle = 2 * 3.14159 + asin(asteroidVelocity.y);
-                    }
-
+                    // add 0.15 rad angle to parent direction and hurl child1 in that direction
                     sf::Vector2f directionToHurl1(cos(velocityAngle + 0.15), sin(velocityAngle + 0.15));
                     Asteroid* b = new Asteroid(asteroid->GetPosition(), AsteroidSize::SMALL, asteroid->GetPosition() + directionToHurl1);
+                    asteroids.insert(b); 
 
+                    // subtract 0.15rad angle to parent direction and hurl child2 in that direction
                     sf::Vector2f directionToHurl2(cos(velocityAngle - 0.15), sin(velocityAngle - 0.15));
                     Asteroid* c = new Asteroid(asteroid->GetPosition(), AsteroidSize::SMALL, asteroid->GetPosition() + directionToHurl2);
-
-                    asteroids.insert(b); 
                     asteroids.insert(c); 
                 }
             }
