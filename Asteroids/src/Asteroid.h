@@ -35,8 +35,10 @@ class Asteroid {
     // update position depending on velocity given by rigidbody
     void updatePosition(float dt);
 
-    // throw the asteroid in player's direction
-    void Hurl();
+    // throw the asteroid towards given point
+    void Hurl(sf::Vector2f destination);
+
+    void SetRandomSpawnPosition();
 
 
     public:
@@ -44,21 +46,28 @@ class Asteroid {
     Asteroid();
 
     // parameterized contructors for setting custom values of following properties
+    // this contructor is used to create a asteroid on spawn ring
     Asteroid(AsteroidSize asteroidSize);
+
+    // this paramertized contructor is used to create asteroid when bigger ones are destroyed
+    Asteroid(sf::Vector2f position, AsteroidSize asteroidSize, sf::Vector2f hurlDirection);
 
     // explicitly set the position of asteroid, should only be set when a new asteroid is instantiated
     void SetPosition(sf::Vector2f position);
 
     // draw the convex shape of the asteroid to given window
-    void draw(sf::RenderWindow& window);
+    void draw(sf::RenderWindow& window) const;
 
-    bool IsPointInside(sf::Vector2f point);
+    bool IsPointInside(sf::Vector2f point) const;
 
     void Hit(float damage);
 
-    float GetHitpoints();
+    float GetHitpoints() const;
+    AsteroidSize GetAsteroidSize() const;
+    sf::Vector2f GetPosition() const;
+    sf::Vector2f GetVelocity() const;
     // returns if the asteroids is the permitted bounds or not
-    bool isInBounds();
+    bool isInBounds() const;
 
     // update function is called in application every frame use it for physics taking input etc.
     void update(float dt);

@@ -23,6 +23,6 @@ class Rigidbody {
     void AddForce(sf::Vector2f force);
 
     // return current velocity
-    sf::Vector2f GetVelocity();
+    sf::Vector2f GetVelocity() const;
     
 };

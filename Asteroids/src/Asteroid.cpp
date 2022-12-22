@@ -14,6 +14,21 @@ static void normalize(sf::Vector2f& vec) {
     vec.y /= magnitude;
 }
 
+// spawn asteroid at a random point on a circle with c = 0, r = 1500.0f
+void Asteroid::SetRandomSpawnPosition() {
+    // get a random angle from 0 - 360
+    float angle = rand() % 360;
+
+    // radius of the circle is 1500
+    const float spawnDistance = 1500.0f;
+
+    // calculate position of the point using angle and distance
+    sf::Vector2f spawnPoint = sf::Vector2f(spawnDistance * cos(angle * 3.14159 / 180), spawnDistance * sin(angle * 3.14159 / 180));
+    
+    // set position to asteroid
+    m_asteroidShape.setPosition(spawnPoint);
+}
+
 // default contructor
 Asteroid::Asteroid() :
 
@@ -40,7 +55,9 @@ m_rigidbody(Rigidbody(100 * 1000, 500))
     m_asteroidShape.setOutlineThickness(3);
     m_asteroidShape.setFillColor(sf::Color::Black);
 
-    Hurl();
+    SetRandomSpawnPosition();
+    sf::Vector2f hurlDestination(rand() % 720, rand() % 720);
+    Hurl(hurlDestination);
 }
 
 // parameterized contructor, same as default execpt for user defined values
@@ -70,7 +87,6 @@ m_asteroidSize(asteroidSize)
     m_maxHitpoints = m_radius;
     m_currentHitpoints = m_radius;
     m_rigidbody = Rigidbody(m_maxHitpoints * 1000, 500);
-    std::cout << "hitpoints: " << m_maxHitpoints << '\n';
     m_asteroidShape.setPointCount(nPoints);
     SetPoints();
     
@@ -78,9 +94,49 @@ m_asteroidSize(asteroidSize)
     m_asteroidShape.setOutlineThickness(3);
     m_asteroidShape.setFillColor(sf::Color::Black);
 
-    Hurl();
+    SetRandomSpawnPosition();
+    sf::Vector2f hurlDestination(rand() % 720, rand() % 720);
+    Hurl(hurlDestination);
 
 }
+
+Asteroid::Asteroid(sf::Vector2f position, AsteroidSize asteroidSize, sf::Vector2f hurlDestination) : 
+m_asteroidSize(asteroidSize)
+// mass of the asteroid is directly propertional to its maximum hitpoints
+{
+    // number of points in the polygon of the asteroid
+    int nPoints = 0;
+    // TODO : change asteroid border thickness by its hitpoints
+    if(asteroidSize == AsteroidSize::SMALL) {
+        m_radius = rand() % 25 + 25;
+        nPoints = rand() % 5 + 5;
+    }
+    else if(asteroidSize == AsteroidSize::MEDIUM) {
+        m_radius = rand() % 25 + 50;
+        nPoints = rand() % 5 + 10;
+    }
+    else {
+        // asteroidSize == AsteroidSize::LARGE
+        m_radius = rand() % 25 + 75;
+        nPoints = rand() % 5 + 15;
+    }
+
+    // the larger that asteroid radius the greater its health
+    // will add some multiplier here for balancing
+    m_maxHitpoints = m_radius;
+    m_currentHitpoints = m_radius;
+    m_rigidbody = Rigidbody(m_maxHitpoints * 1000, 500);
+    m_asteroidShape.setPointCount(nPoints);
+    SetPoints();
+    
+    m_asteroidShape.setOutlineColor(sf::Color::White);
+    m_asteroidShape.setOutlineThickness(3);
+    m_asteroidShape.setFillColor(sf::Color::Black);
+    m_asteroidShape.setPosition(position);
+
+    Hurl(hurlDestination);
+}
+
 
 // generate vertices for shape of asteroid
 void Asteroid::SetPoints() {
@@ -120,19 +176,14 @@ void Asteroid::SetPosition(sf::Vector2f position) {
     m_asteroidShape.setPosition(position);
 }
 
-void Asteroid::draw(sf::RenderWindow& window) {
+void Asteroid::draw(sf::RenderWindow& window) const {
     window.draw(m_asteroidShape);
 }
 
-void Asteroid::Hurl() {
-    float angle = rand() % 360;
-    const float spawnDistance = 1500.0f;
-    sf::Vector2f spawnPoint = sf::Vector2f(spawnDistance * cos(angle * 3.14159 / 180), spawnDistance * sin(angle * 3.14159 / 180));
-    
-    m_asteroidShape.setPosition(spawnPoint);
+void Asteroid::Hurl(sf::Vector2f destination) {
 
+    const sf::Vector2f spawnPoint = m_asteroidShape.getPosition();
     // destination of asteroid is a random point on the screen;
-    sf::Vector2f destination = sf::Vector2f(rand() % 720, rand() % 720);
 
     sf::Vector2f forceDir = destination - spawnPoint;
 
@@ -158,7 +209,7 @@ bool pointTriangleIntersection(sf::Vector2f p, sf::Vector2f a, sf::Vector2f b, s
     return (b0 == b1 && b1 == b2);
 }
 
-bool Asteroid::IsPointInside(sf::Vector2f point) {
+bool Asteroid::IsPointInside(sf::Vector2f point) const {
 
     int nPoints = m_asteroidShape.getPointCount();
 
@@ -186,8 +237,20 @@ void Asteroid::Hit(float damage) {
     m_currentHitpoints -= damage;
 }
 
-float Asteroid::GetHitpoints() {
+float Asteroid::GetHitpoints() const {
     return m_currentHitpoints;
+}
+
+sf::Vector2f Asteroid::GetVelocity() const {
+    return m_rigidbody.GetVelocity();
+}
+
+AsteroidSize Asteroid::GetAsteroidSize() const {
+    return m_asteroidSize;
+}
+
+sf::Vector2f Asteroid::GetPosition() const {
+    return m_asteroidShape.getPosition();
 }
 
 void Asteroid::updatePosition(float dt) {
@@ -203,7 +266,7 @@ void Asteroid::update(float dt) {
     updatePosition(dt);
 }
 
-bool Asteroid::isInBounds() {
+bool Asteroid::isInBounds() const {
     auto currentPosition = m_asteroidShape.getPosition();
 
     float distanceFromOrigin = sqrtf((currentPosition.x * currentPosition.x) + (currentPosition.y * currentPosition.y));
