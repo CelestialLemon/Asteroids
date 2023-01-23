@@ -36,7 +36,7 @@ class Asteroid {
     void updatePosition(float dt);
 
     // throw the asteroid towards given point
-    void Hurl(sf::Vector2f destination);
+    void Hurl(sf::Vector2f destination, float force);
 
     void SetRandomSpawnPosition();
 
@@ -50,7 +50,7 @@ class Asteroid {
     Asteroid(AsteroidSize asteroidSize);
 
     // this paramertized contructor is used to create asteroid when bigger ones are destroyed
-    Asteroid(sf::Vector2f position, AsteroidSize asteroidSize, sf::Vector2f hurlDirection);
+    Asteroid(sf::Vector2f position, AsteroidSize asteroidSize, sf::Vector2f hurlDirection, float force);
 
     // explicitly set the position of asteroid, should only be set when a new asteroid is instantiated
     void SetPosition(sf::Vector2f position);

@@ -57,7 +57,7 @@ m_rigidbody(Rigidbody(100 * 1000, 500))
 
     SetRandomSpawnPosition();
     sf::Vector2f hurlDestination(rand() % 720, rand() % 720);
-    Hurl(hurlDestination);
+    Hurl(hurlDestination, 25e6);
 }
 
 // parameterized contructor, same as default execpt for user defined values
@@ -96,11 +96,13 @@ m_asteroidSize(asteroidSize)
 
     SetRandomSpawnPosition();
     sf::Vector2f hurlDestination(rand() % 720, rand() % 720);
-    Hurl(hurlDestination);
+
+    // Hurl with a force of 25M newtons
+    Hurl(hurlDestination, 25e6);
 
 }
 
-Asteroid::Asteroid(sf::Vector2f position, AsteroidSize asteroidSize, sf::Vector2f hurlDestination) : 
+Asteroid::Asteroid(sf::Vector2f position, AsteroidSize asteroidSize, sf::Vector2f hurlDestination, float force) : 
 m_asteroidSize(asteroidSize)
 // mass of the asteroid is directly propertional to its maximum hitpoints
 {
@@ -134,7 +136,7 @@ m_asteroidSize(asteroidSize)
     m_asteroidShape.setFillColor(sf::Color::Black);
     m_asteroidShape.setPosition(position);
 
-    Hurl(hurlDestination);
+    Hurl(hurlDestination, force);
 }
 
 
@@ -180,7 +182,7 @@ void Asteroid::draw(sf::RenderWindow& window) const {
     window.draw(m_asteroidShape);
 }
 
-void Asteroid::Hurl(sf::Vector2f destination) {
+void Asteroid::Hurl(sf::Vector2f destination, float force) {
 
     const sf::Vector2f spawnPoint = m_asteroidShape.getPosition();
     // destination of asteroid is a random point on the screen;
@@ -190,8 +192,8 @@ void Asteroid::Hurl(sf::Vector2f destination) {
     normalize(forceDir);
 
     // TODO: Hurl asteroids with different forces
-    forceDir.x *= 25000000;
-    forceDir.y *= 25000000;
+    forceDir.x *= force;
+    forceDir.y *= force;
 
     m_rigidbody.AddForce(forceDir);
 }

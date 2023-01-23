@@ -136,12 +136,12 @@ void Application::Run() {
 
                     // add 0.15 rad angle to parent direction and hurl child1 in that direction
                     sf::Vector2f directionToHurl1(cos(velocityAngle + 0.15), sin(velocityAngle + 0.15));
-                    Asteroid* b = new Asteroid(asteroid->GetPosition(), AsteroidSize::SMALL, asteroid->GetPosition() + directionToHurl1);
+                    Asteroid* b = new Asteroid(asteroid->GetPosition(), AsteroidSize::SMALL, asteroid->GetPosition() + directionToHurl1, 10e6);
                     asteroids.insert(b); 
 
                     // subtract 0.15rad angle to parent direction and hurl child2 in that direction
                     sf::Vector2f directionToHurl2(cos(velocityAngle - 0.15), sin(velocityAngle - 0.15));
-                    Asteroid* c = new Asteroid(asteroid->GetPosition(), AsteroidSize::SMALL, asteroid->GetPosition() + directionToHurl2);
+                    Asteroid* c = new Asteroid(asteroid->GetPosition(), AsteroidSize::SMALL, asteroid->GetPosition() + directionToHurl2, 10e6);
                     asteroids.insert(c); 
                 }
             }
