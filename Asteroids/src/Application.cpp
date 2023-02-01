@@ -51,7 +51,7 @@ void Application::Run() {
     sprite_staryBackground.setPosition(sf::Vector2f(360, 360));
     sprite_staryBackground.setColor(sf::Color(255, 255, 255, 150));
     Spaceship player;
-    player.loadTextureFromFile("./res/images/spaceship.png");
+    player.loadTextureFromFile("./res/images/spaceship_02.png");
     player.setPosition(sf::Vector2f(360, 360));
 
     // holds all the instantiated asteroids in the scene
