@@ -255,6 +255,14 @@ sf::Vector2f Asteroid::GetPosition() const {
     return m_asteroidShape.getPosition();
 }
 
+float Asteroid::GetRotation() const { 
+    return m_asteroidShape.getRotation();
+}
+
+sf::ConvexShape Asteroid::GetConvexShape() const {
+    return m_asteroidShape;
+}
+
 void Asteroid::updatePosition(float dt) {
     auto currentVelocity = m_rigidbody.GetVelocity();
 

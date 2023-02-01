@@ -114,8 +114,10 @@ void Application::Run() {
         // auto bounds = player.getGlobalBounds();
         // printf("Bounds, left: %.2f, top: %.2f\n", bounds.left, bounds.top);
         //window.draw(asteroid);
+        if(player.AsteroidSpaceshipCollision(asteroids, window)) std::cout << "AS-SP COL ";
 
         window.display();
+
 
         std::vector<Asteroid*> toDelete;
         std::vector<Asteroid*> toAdd;

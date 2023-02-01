@@ -24,6 +24,9 @@ class Spaceship : public Sprite {
     sf::Texture m_bulletTexture;
     //std::vector<Bullet*> m_bullets;
     std::unordered_set<Bullet*> m_bullets;
+
+    // polygon collider for spaceship
+    sf::ConvexShape collider;
     
     // gun has charge level, increases every second by given speed, fires when reaching maxcharge
     int gunMaxCharge, gunRechargeSpeed;
@@ -37,6 +40,8 @@ class Spaceship : public Sprite {
 
     void AsteroidBulletCollision(const std::unordered_set<Asteroid*>& asteroids);
 
+    bool AsteroidSpaceshipCollision(const std::unordered_set<Asteroid*>& asteroids, sf::RenderWindow& window);
+
     // update the position of the ship by calculating next position given currentPos and velocity and dt
     void updatePosition(float dt);
 
@@ -45,4 +50,5 @@ class Spaceship : public Sprite {
     
     // take input from user to move the spaceship
     void update(float dt, sf::RenderWindow& window) override;
+
 };
