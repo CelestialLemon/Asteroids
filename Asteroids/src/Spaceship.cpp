@@ -235,7 +235,7 @@ bool TriangleSATCollision(const std::vector<sf::Vector2f>& vertices1, const std:
 
     for(auto normal : normals) {
         
-        float t1Min = FLT_MAX, t1Max = FLT_MIN;
+        float t1Min = 1e12, t1Max = -1e12;
 
         for(auto vertex : vertices1) {
             float projection = Vector2fDot(vertex, normal);
@@ -243,7 +243,7 @@ bool TriangleSATCollision(const std::vector<sf::Vector2f>& vertices1, const std:
             t1Max = std::max(t1Max, projection);
         }
 
-        float t2Min = FLT_MAX, t2Max = FLT_MIN;
+        float t2Min = 1e12, t2Max = -1e12;
 
         for(auto vertex : vertices2) {
             float projection = Vector2fDot(vertex, normal);
