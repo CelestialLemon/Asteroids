@@ -5,7 +5,10 @@
 #include <SFML/Graphics.hpp>
 
 class Bullet : public Sprite {
+    // rigidbody for controlling physics of the bullet instance
     Rigidbody m_rb;
+
+    // force with which the bullet is fired
     const float m_fireForce;
 
     // default-contstructor not allowed

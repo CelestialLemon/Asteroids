@@ -1,11 +1,25 @@
 #include "Spaceship.h"
 
+const float SPACESHIP_THRUST = 600000;
+const int SPACESHIP_MASS = 4000;
+const float SPACESHIP_MAX_SPEED = 300;
+const float SPACESHIP_GUN_MAX_CHARGE = 100;
+
+// charge added per second
+// so recharge speed = 500, max charge = 100, means gun will fire every 0.2 seconds
+const float SPACESHIP_GUN_RECHARGE_SPEED = 500;
+const float SPACESHIP_GUN_DAMAGE = 40;
+
+const float SPACESHIP_COLLIDER_N_POINTS = 4;
+const std::string BULLET_TEXTURE_FILEPATH = "./res/images/bullet.png";
+
 // initialize the spaceship params
 Spaceship::Spaceship() 
-: m_thrust(600000), m_rigidbody(Rigidbody(4000, 300)), gunMaxCharge(100), gunRechargeSpeed(500), gunCurrentCharge(0.0f), collider(4)
+: m_thrust(SPACESHIP_THRUST), m_rigidbody(Rigidbody(SPACESHIP_MASS, SPACESHIP_MAX_SPEED)), gunMaxCharge(SPACESHIP_GUN_MAX_CHARGE), gunRechargeSpeed(SPACESHIP_GUN_RECHARGE_SPEED), gunCurrentCharge(0.0f), collider(SPACESHIP_COLLIDER_N_POINTS)
 {
-    m_bulletTexture.loadFromFile("./res/images/bullet.png");
+    m_bulletTexture.loadFromFile(BULLET_TEXTURE_FILEPATH);
 
+    // set points for collider polygon in local units with center of sprite as origin
     collider.setPoint(0, sf::Vector2f(27, 0));
     collider.setPoint(1, sf::Vector2f(-27, 27));
     collider.setPoint(2, sf::Vector2f(-17, 0));
@@ -15,7 +29,7 @@ Spaceship::Spaceship()
 // update the position of the ship by calculating next position given currentPos and velocity and dt
 void Spaceship::updatePosition(float dt) {
     
-    sf::Vector2f currentVelocity = m_rigidbody.GetVelocity();
+    const sf::Vector2f currentVelocity = m_rigidbody.GetVelocity();
 
     float dy = currentVelocity.y * dt;
     float dx = currentVelocity.x * dt;
@@ -39,7 +53,7 @@ void Spaceship::updatePosition(float dt) {
 
 void Spaceship::updateRotation(float dt, sf::Vector2f mousePosition) {
     
-    auto playerPosition = getPosition();
+    const auto playerPosition = getPosition();
     // set player position to center of sprite
     //playerPosition.x += 32.0f;
     //playerPosition.y += 32.0f;
@@ -48,7 +62,7 @@ void Spaceship::updateRotation(float dt, sf::Vector2f mousePosition) {
     auto mouseDirection = mousePosition - playerPosition;
 
     // normalize the direction
-    float magnitude = sqrtf((mouseDirection.x * mouseDirection.x) + (mouseDirection.y * mouseDirection.y));
+    const float magnitude = sqrtf((mouseDirection.x * mouseDirection.x) + (mouseDirection.y * mouseDirection.y));
     
     mouseDirection.x /= magnitude;
     mouseDirection.y /= magnitude;
@@ -75,10 +89,10 @@ void Spaceship::Fire() {
         sf::Vector2f fireFrom = getPosition();
 
         // distance from center of spaceship to its front tip
-        float distanceFromCenter = 20.0f;
+        const float distanceFromCenter = 20.0f;
 
-        float dy = distanceFromCenter * sinf(getRotation() * 3.14159f / 180.0f); 
-        float dx = distanceFromCenter * cosf(getRotation() * 3.14159f / 180.0f); 
+        const float dy = distanceFromCenter * sinf(getRotation() * 3.14159f / 180.0f); 
+        const float dx = distanceFromCenter * cosf(getRotation() * 3.14159f / 180.0f); 
 
         // add some displacement in the forward direction so bullet is fired from tip of plane
         fireFrom += sf::Vector2f(dx, dy);
@@ -86,7 +100,7 @@ void Spaceship::Fire() {
         // create new bullet
         Bullet* b = new Bullet(fireFrom, sf::Vector2f(dx, dy), m_bulletTexture);
 
-        // add new bullet to the map of bullets
+        // add new bullet to the set of bullets
         m_bullets.insert(b);
 
         // reset gun charge
@@ -158,7 +172,7 @@ void Spaceship::update(float dt, sf::RenderWindow& window) {
         if(!bullet->isInBounds()) toDelete.push_back(bullet);
     }
 
-    // remove the outofbound bullets from map and delete them
+    // remove the outofbound bullets from set and delete them
     for(auto bullet : toDelete) {
         m_bullets.erase(bullet);
         delete(bullet);
@@ -181,7 +195,9 @@ void Spaceship::AsteroidBulletCollision(const std::unordered_set<Asteroid*>& ast
                 bullets_hit.push_back(bullet);
 
                 // reduce asteroid hitpoints
-                asteroid->Hit(40);
+                asteroid->Hit(SPACESHIP_GUN_DAMAGE);
+
+                // if a bullet has already hit an asteroid we don't need to check collision with other asteroids
                 break;
             }
         }
@@ -212,65 +228,68 @@ float Vector2fDot (sf::Vector2f a, sf::Vector2f b) {
     return (a.x * b.x + a.y * b.y);
 }
 
-bool TriangleSATCollision(const std::vector<sf::Vector2f>& vertices1, const std::vector<sf::Vector2f>& vertices2, sf::RenderWindow& window) {
+bool TriangleSATCollision(const std::vector<sf::Vector2f>& vertices1, const std::vector<sf::Vector2f>& vertices2) {
     // vertices 1 and 2 will have 3 vertices each as they are triangles
     // there will be 6 normals
     
     std::vector<sf::Vector2f> normals(vertices1.size() + vertices2.size());
 
-    
-    // sf::VertexArray t1(sf::Triangles, 3);
-    // t1[0] = vertices1[0]; t1[0].color = sf::Color::Red;
-    // t1[1] = vertices1[1]; t1[1].color = sf::Color::Red;
-    // t1[2] = vertices1[2]; t1[2].color = sf::Color::Red;
-    // window.draw(t1);
-
+    // calculate normals for triangle 1
     normals[0] = CalculateNormal(vertices1[0], vertices1[1]);
     normals[1] = CalculateNormal(vertices1[1], vertices1[2]);
     normals[2] = CalculateNormal(vertices1[2], vertices1[0]);
 
+    // calculate normals for triangle 2
     normals[3] = CalculateNormal(vertices2[0], vertices2[1]);
     normals[4] = CalculateNormal(vertices2[1], vertices2[2]);
     normals[5] = CalculateNormal(vertices2[2], vertices2[0]);
 
     for(auto normal : normals) {
         
+        // setting this to FLT_MAX or FLT_MIN causes issues, so I've set a arbitrary high and low values
         float t1Min = 1e12, t1Max = -1e12;
 
         for(auto vertex : vertices1) {
+            // project vertex onto the normal using dot product
             float projection = Vector2fDot(vertex, normal);
+
+            // find max and min projection for triangle1
             t1Min = std::min(t1Min, projection);
             t1Max = std::max(t1Max, projection);
         }
 
         float t2Min = 1e12, t2Max = -1e12;
 
+        // do the same as for triangle1
         for(auto vertex : vertices2) {
             float projection = Vector2fDot(vertex, normal);
             t2Min = std::min(t2Min, projection);
             t2Max = std::max(t2Max, projection);
         }
 
+        // check if projections overlap
+        // if there is a gap return no collision
+        // if there is no gap continue checking with other normals
         if(t1Max < t2Min || t2Max < t1Min) {
             return false;
         }
     }
 
-    sf::ConvexShape t1(3), t2(3);
-    t1.setFillColor(sf::Color::Red);
-    t2.setFillColor(sf::Color::Red);
-    t1.setPoint(0, vertices1[0]);
-    t1.setPoint(1, vertices1[1]);
-    t1.setPoint(2, vertices1[2]);
-    t2.setPoint(0, vertices2[0]);
-    t2.setPoint(1, vertices2[1]);
-    t2.setPoint(2, vertices2[2]);
-    window.draw(t1);
-    window.draw(t2);
+    // if no gap after checking all the normals return collision
     return true;
 }
 
-bool Spaceship::AsteroidSpaceshipCollision(const std::unordered_set<Asteroid*>& asteroids, sf::RenderWindow& window) {
+/*
+    I'm breaking down colliders into triangles and testing collision for each trianlge
+    Breaking down complex colliders into convex ones seems like the more efficient approach
+    But I don't know the algorithm, and learning it will take some time
+    I don't know how much it will affect performance without benchmarking both approaches
+    As the game already runs pretty fine, I'll just take the easy way.
+*/
+
+bool Spaceship::AsteroidSpaceshipCollision(const std::unordered_set<Asteroid*>& asteroids) {
+
+    // triangles of the polygon of the spaceship collider
     std::vector<Triangle> spaceshipColliderTriangles = {
         Triangle(
             TransformPoint(collider.getPoint(0), getRotation(), getPosition()),
@@ -285,12 +304,15 @@ bool Spaceship::AsteroidSpaceshipCollision(const std::unordered_set<Asteroid*>& 
     };
 
     for(auto asteroid : asteroids) {
+
+        // calculate the triangles that make up the asteroids
         std::vector<Triangle> asteroidColliderTriangles;
 
         const sf::ConvexShape asteroidShape = asteroid->GetConvexShape();
         const size_t nPoints = asteroidShape.getPointCount();
 
         for(size_t i = 0; i < nPoints - 1; i++) {
+            // construct a triangle with two vertices of the asteroid and it's center
             asteroidColliderTriangles.push_back(
                 Triangle(
                     TransformPoint(sf::Vector2f(0, 0), asteroidShape.getRotation(), asteroidShape.getPosition()),
@@ -300,6 +322,7 @@ bool Spaceship::AsteroidSpaceshipCollision(const std::unordered_set<Asteroid*>& 
             );
         }
 
+        // last triangle
         asteroidColliderTriangles.push_back(
             Triangle(
                 TransformPoint(sf::Vector2f(0, 0), asteroidShape.getRotation(), asteroidShape.getPosition()),
@@ -308,12 +331,14 @@ bool Spaceship::AsteroidSpaceshipCollision(const std::unordered_set<Asteroid*>& 
             )
         );
 
+
         for(auto asteroidTriangle : asteroidColliderTriangles) {
             for(auto spaceshipTriangle : spaceshipColliderTriangles) {
+                // for every spaceship triangle and asteroid triangle, check collision
                 std::vector<sf::Vector2f> vertices1 = {asteroidTriangle.a , asteroidTriangle.b, asteroidTriangle.c};
                 std::vector<sf::Vector2f> vertices2 = {spaceshipTriangle.a , spaceshipTriangle.b, spaceshipTriangle.c};
 
-                if(TriangleSATCollision(vertices1, vertices2, window)) {
+                if(TriangleSATCollision(vertices1, vertices2)) {
                     return true;
                 }
             }

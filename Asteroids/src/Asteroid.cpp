@@ -56,6 +56,8 @@ m_rigidbody(Rigidbody(100 * 1000, 500))
     m_asteroidShape.setFillColor(sf::Color::Black);
 
     SetRandomSpawnPosition();
+
+    // get a random point on screen and hurl asteroid towards it
     sf::Vector2f hurlDestination(rand() % 720, rand() % 720);
     Hurl(hurlDestination, 25e6);
 }
@@ -109,6 +111,18 @@ m_asteroidSize(asteroidSize)
     // number of points in the polygon of the asteroid
     int nPoints = 0;
     // TODO : change asteroid border thickness by its hitpoints
+
+    /*
+        SMALL asteroids have a radius between 25 and 50 pixels
+        they can also have 5 to 10 points in their geometry
+
+        MEDIUM asteroids have a radius between 50 and 75 pixels
+        they can also have 10 to 15 points in their geometry
+
+        LARGE asteroids have a radius between 50 and 75 pixels
+        they can also have 15 to 20 points in their geometry
+    */
+
     if(asteroidSize == AsteroidSize::SMALL) {
         m_radius = rand() % 25 + 25;
         nPoints = rand() % 5 + 5;
@@ -184,16 +198,16 @@ void Asteroid::draw(sf::RenderWindow& window) const {
 
 void Asteroid::Hurl(sf::Vector2f destination, float force) {
 
-    const sf::Vector2f spawnPoint = m_asteroidShape.getPosition();
-    // destination of asteroid is a random point on the screen;
+    // get current position of asteroid
+    const sf::Vector2f currentPosition = m_asteroidShape.getPosition();
 
-    sf::Vector2f forceDir = destination - spawnPoint;
+    // calculate which direction to push the asteroid in
+    sf::Vector2f forceDir = destination - currentPosition;
 
     normalize(forceDir);
 
     // TODO: Hurl asteroids with different forces
-    forceDir.x *= force;
-    forceDir.y *= force;
+    forceDir *= force;
 
     m_rigidbody.AddForce(forceDir);
 }
@@ -216,6 +230,7 @@ bool Asteroid::IsPointInside(sf::Vector2f point) const {
     int nPoints = m_asteroidShape.getPointCount();
 
     for(int i = 0; i < nPoints - 1; i++) {
+        // form a triangle with two vertices of the asteroid and the center
         sf::Vector2f pointA = m_asteroidShape.getPoint(i) + m_asteroidShape.getPosition();
         sf::Vector2f pointB = m_asteroidShape.getPoint(i + 1) + m_asteroidShape.getPosition();
         sf::Vector2f pointC = m_asteroidShape.getPosition();
@@ -231,10 +246,10 @@ bool Asteroid::IsPointInside(sf::Vector2f point) const {
 
     bool isInTriangle = pointTriangleIntersection(point, pointA, pointB, pointC);
 
-    if(isInTriangle) return true;
-    else return false;
+    return isInTriangle;
 }
 
+// when asteroid is hit, take given damage, i.e reduce health by give amount
 void Asteroid::Hit(float damage) {
     m_currentHitpoints -= damage;
 }

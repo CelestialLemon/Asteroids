@@ -42,11 +42,11 @@ without exceeding max speed.
 */
 
 void Rigidbody::clampVelocity() {
-    float currentSpeed = sqrtf((m_velocity.x * m_velocity.x) + (m_velocity.y * m_velocity.y));
+    const float currentSpeed = sqrtf((m_velocity.x * m_velocity.x) + (m_velocity.y * m_velocity.y));
 
     if(currentSpeed <= m_maxSpeed) return;
 
-    float scalingFactor = m_maxSpeed / currentSpeed;
+    const float scalingFactor = m_maxSpeed / currentSpeed;
 
     m_velocity.x *= scalingFactor;
     m_velocity.y *= scalingFactor;
@@ -56,10 +56,10 @@ void Rigidbody::clampVelocity() {
 // take a vector2 force add calculate change in velocity
 void Rigidbody::AddForce(sf::Vector2f force) {
 
-    float currentSpeed = sqrtf((m_velocity.x * m_velocity.x) + (m_velocity.y * m_velocity.y));
+    const float currentSpeed = sqrtf((m_velocity.x * m_velocity.x) + (m_velocity.y * m_velocity.y));
 
-    float xAcceleration = force.x / m_mass;
-    float yAcceleration = force.y / m_mass;
+    const float xAcceleration = force.x / m_mass;
+    const float yAcceleration = force.y / m_mass;
 
     m_velocity += sf::Vector2f(xAcceleration, yAcceleration);
 

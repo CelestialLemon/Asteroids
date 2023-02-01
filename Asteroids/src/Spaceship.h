@@ -18,11 +18,13 @@ class Spaceship : public Sprite {
     Rigidbody m_rigidbody;
     
     // amount of force applied to the rigidbody per second
+    // how much thrust the spaceship can generate
     float m_thrust;
 
     // holds the texture of bullets, for creating new one
     sf::Texture m_bulletTexture;
-    //std::vector<Bullet*> m_bullets;
+
+    // holds reference to all bullets in the game
     std::unordered_set<Bullet*> m_bullets;
 
     // polygon collider for spaceship
@@ -40,7 +42,7 @@ class Spaceship : public Sprite {
 
     void AsteroidBulletCollision(const std::unordered_set<Asteroid*>& asteroids);
 
-    bool AsteroidSpaceshipCollision(const std::unordered_set<Asteroid*>& asteroids, sf::RenderWindow& window);
+    bool AsteroidSpaceshipCollision(const std::unordered_set<Asteroid*>& asteroids);
 
     // update the position of the ship by calculating next position given currentPos and velocity and dt
     void updatePosition(float dt);
