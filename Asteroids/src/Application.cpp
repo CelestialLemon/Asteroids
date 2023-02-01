@@ -3,6 +3,7 @@
 #include "Bullet.h"
 #include "Asteroid.h"
 #include <iostream>
+#include <string>
 
 static void normalize(sf::Vector2f& vec) {
     float magnitude = sqrtf((vec.x * vec.x) + (vec.y * vec.y));
@@ -41,7 +42,12 @@ Application::Application(int resX, int resY)
 void Application::Run() {
     
     Sprite sprite_staryBackground;
-    sprite_staryBackground.loadTextureFromFile("./res/images/background_01.png");
+
+    // load a random background from 6 backgrounds
+    short backgroundNum = rand() % 6 + 1;
+    std::string backgroundFileName = "./res/images/background_0" + std::to_string(backgroundNum) + ".png";
+    sprite_staryBackground.loadTextureFromFile(backgroundFileName);
+
     sprite_staryBackground.setPosition(sf::Vector2f(360, 360));
     sprite_staryBackground.setColor(sf::Color(255, 255, 255, 150));
     Spaceship player;
