@@ -1,6 +1,12 @@
 #include "Asteroid.h"
 #include <iostream>
 
+// new asteroids spawn at this radius around the origin
+const float ASTEROID_SPAWN_DISTANCE = 1500.0f;
+
+// asteroids outside the circle with this radius will be deleted
+const float ASTEROID_DESPAWN_DISTANCE = 1700.0f;
+
 static float randomFloat() {
     // returns random float between 0.5 and 0.99
     int r = rand() % 50 + 50;
@@ -19,11 +25,11 @@ void Asteroid::SetRandomSpawnPosition() {
     // get a random angle from 0 - 360
     float angle = rand() % 360;
 
-    // radius of the circle is 1500
-    const float spawnDistance = 1500.0f;
-
     // calculate position of the point using angle and distance
-    sf::Vector2f spawnPoint = sf::Vector2f(spawnDistance * cos(angle * 3.14159 / 180), spawnDistance * sin(angle * 3.14159 / 180));
+    sf::Vector2f spawnPoint = sf::Vector2f(
+        ASTEROID_SPAWN_DISTANCE * cos(angle * 3.14159 / 180), 
+        ASTEROID_SPAWN_DISTANCE * sin(angle * 3.14159 / 180)
+    );
     
     // set position to asteroid
     m_asteroidShape.setPosition(spawnPoint);
@@ -56,6 +62,8 @@ m_rigidbody(Rigidbody(100 * 1000, 500))
     m_asteroidShape.setFillColor(sf::Color::Black);
 
     SetRandomSpawnPosition();
+
+    // get a random point on screen and hurl asteroid towards it
     sf::Vector2f hurlDestination(rand() % 720, rand() % 720);
     Hurl(hurlDestination, 25e6);
 }
@@ -109,6 +117,18 @@ m_asteroidSize(asteroidSize)
     // number of points in the polygon of the asteroid
     int nPoints = 0;
     // TODO : change asteroid border thickness by its hitpoints
+
+    /*
+        SMALL asteroids have a radius between 25 and 50 pixels
+        they can also have 5 to 10 points in their geometry
+
+        MEDIUM asteroids have a radius between 50 and 75 pixels
+        they can also have 10 to 15 points in their geometry
+
+        LARGE asteroids have a radius between 50 and 75 pixels
+        they can also have 15 to 20 points in their geometry
+    */
+
     if(asteroidSize == AsteroidSize::SMALL) {
         m_radius = rand() % 25 + 25;
         nPoints = rand() % 5 + 5;
@@ -184,16 +204,16 @@ void Asteroid::draw(sf::RenderWindow& window) const {
 
 void Asteroid::Hurl(sf::Vector2f destination, float force) {
 
-    const sf::Vector2f spawnPoint = m_asteroidShape.getPosition();
-    // destination of asteroid is a random point on the screen;
+    // get current position of asteroid
+    const sf::Vector2f currentPosition = m_asteroidShape.getPosition();
 
-    sf::Vector2f forceDir = destination - spawnPoint;
+    // calculate which direction to push the asteroid in
+    sf::Vector2f forceDir = destination - currentPosition;
 
     normalize(forceDir);
 
     // TODO: Hurl asteroids with different forces
-    forceDir.x *= force;
-    forceDir.y *= force;
+    forceDir *= force;
 
     m_rigidbody.AddForce(forceDir);
 }
@@ -216,6 +236,7 @@ bool Asteroid::IsPointInside(sf::Vector2f point) const {
     int nPoints = m_asteroidShape.getPointCount();
 
     for(int i = 0; i < nPoints - 1; i++) {
+        // form a triangle with two vertices of the asteroid and the center
         sf::Vector2f pointA = m_asteroidShape.getPoint(i) + m_asteroidShape.getPosition();
         sf::Vector2f pointB = m_asteroidShape.getPoint(i + 1) + m_asteroidShape.getPosition();
         sf::Vector2f pointC = m_asteroidShape.getPosition();
@@ -231,10 +252,10 @@ bool Asteroid::IsPointInside(sf::Vector2f point) const {
 
     bool isInTriangle = pointTriangleIntersection(point, pointA, pointB, pointC);
 
-    if(isInTriangle) return true;
-    else return false;
+    return isInTriangle;
 }
 
+// when asteroid is hit, take given damage, i.e reduce health by give amount
 void Asteroid::Hit(float damage) {
     m_currentHitpoints -= damage;
 }
@@ -253,6 +274,14 @@ AsteroidSize Asteroid::GetAsteroidSize() const {
 
 sf::Vector2f Asteroid::GetPosition() const {
     return m_asteroidShape.getPosition();
+}
+
+float Asteroid::GetRotation() const { 
+    return m_asteroidShape.getRotation();
+}
+
+sf::ConvexShape Asteroid::GetConvexShape() const {
+    return m_asteroidShape;
 }
 
 void Asteroid::updatePosition(float dt) {
@@ -274,7 +303,7 @@ bool Asteroid::isInBounds() const {
     float distanceFromOrigin = sqrtf((currentPosition.x * currentPosition.x) + (currentPosition.y * currentPosition.y));
 
     // asteroid should not exist outside 3000 units from origin
-    if(distanceFromOrigin >= 3000) return false;
+    if(distanceFromOrigin >= ASTEROID_DESPAWN_DISTANCE) return false;
     else return true;
 }
 

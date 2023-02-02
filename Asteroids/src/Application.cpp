@@ -3,6 +3,7 @@
 #include "Bullet.h"
 #include "Asteroid.h"
 #include <iostream>
+#include <string>
 
 static void normalize(sf::Vector2f& vec) {
     float magnitude = sqrtf((vec.x * vec.x) + (vec.y * vec.y));
@@ -41,16 +42,21 @@ Application::Application(int resX, int resY)
 void Application::Run() {
     
     Sprite sprite_staryBackground;
-    sprite_staryBackground.loadTextureFromFile("./res/images/background_01.png");
+
+    // load a random background from 6 backgrounds
+    short backgroundNum = rand() % 6 + 1;
+    std::string backgroundFileName = "./res/images/background_0" + std::to_string(backgroundNum) + ".png";
+    sprite_staryBackground.loadTextureFromFile(backgroundFileName);
+
     sprite_staryBackground.setPosition(sf::Vector2f(360, 360));
     sprite_staryBackground.setColor(sf::Color(255, 255, 255, 150));
+
     Spaceship player;
-    player.loadTextureFromFile("./res/images/spaceship.png");
+    player.loadTextureFromFile("./res/images/spaceship_02.png");
     player.setPosition(sf::Vector2f(360, 360));
 
     // holds all the instantiated asteroids in the scene
     std::unordered_set<Asteroid*> asteroids;
-    int nAsteroidsDestroyed = 0;
 
     // spawn an asteroid every 1.0f seconds
     const float spawnSpeed = 1.0f;
@@ -73,6 +79,8 @@ void Application::Run() {
 
         float dt = clock.restart().asSeconds();
 
+        // ----------------------------------------------------------------------------------------------------
+        // Asteroid spawn logic
         if(timeSinceLastAsteroidSpawn >= spawnSpeed) {
             
             // get a random number from 0-2 for spawning asteroid
@@ -91,7 +99,12 @@ void Application::Run() {
         }
         else timeSinceLastAsteroidSpawn += dt;
 
+        // ----------------------------------------------------------------------------------------------------
+
         window.clear();
+        // Game logic
+
+
         player.update(dt, window);
 
         // loops through asteroids and bullets to check if any have collided
@@ -108,8 +121,10 @@ void Application::Run() {
         // auto bounds = player.getGlobalBounds();
         // printf("Bounds, left: %.2f, top: %.2f\n", bounds.left, bounds.top);
         //window.draw(asteroid);
+        if(player.AsteroidSpaceshipCollision(asteroids)) window.close();
 
         window.display();
+
 
         std::vector<Asteroid*> toDelete;
         std::vector<Asteroid*> toAdd;
@@ -121,8 +136,6 @@ void Application::Run() {
             // if asteroid has reached 0 hitpoints, we need to destroy it
             if(asteroid->GetHitpoints() <= 0) {
                 toDelete.push_back(asteroid);
-                nAsteroidsDestroyed++;
-                std::cout << nAsteroidsDestroyed << '\n';
                 // if a large asteroid was destroyed by reaching 0 hitpoints, spawn 2 small ones
                 if(asteroid->GetAsteroidSize() == AsteroidSize::LARGE) {
 
@@ -137,12 +150,12 @@ void Application::Run() {
                     // add 0.15 rad angle to parent direction and hurl child1 in that direction
                     sf::Vector2f directionToHurl1(cos(velocityAngle + 0.15), sin(velocityAngle + 0.15));
                     Asteroid* b = new Asteroid(asteroid->GetPosition(), AsteroidSize::SMALL, asteroid->GetPosition() + directionToHurl1, 10e6);
-                    asteroids.insert(b); 
+                    toAdd.push_back(b);
 
                     // subtract 0.15rad angle to parent direction and hurl child2 in that direction
                     sf::Vector2f directionToHurl2(cos(velocityAngle - 0.15), sin(velocityAngle - 0.15));
                     Asteroid* c = new Asteroid(asteroid->GetPosition(), AsteroidSize::SMALL, asteroid->GetPosition() + directionToHurl2, 10e6);
-                    asteroids.insert(c); 
+                    toAdd.push_back(c); 
                 }
             }
         }

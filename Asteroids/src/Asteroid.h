@@ -64,7 +64,9 @@ class Asteroid {
 
     float GetHitpoints() const;
     AsteroidSize GetAsteroidSize() const;
+    sf::ConvexShape GetConvexShape() const;
     sf::Vector2f GetPosition() const;
+    float GetRotation() const;
     sf::Vector2f GetVelocity() const;
     // returns if the asteroids is the permitted bounds or not
     bool isInBounds() const;
