@@ -8,7 +8,9 @@
 Application::Application(int resX, int resY) 
     : window(sf::VideoMode(resX, resY), "Asteroids", sf::Style::Close),
     // start the game always with scene 0
-    currentScene(0)
+    currentScene(0),
+    // start the game always with score 0
+    score(0)
 { srand(time(0)); }
 
 void Application::Run() {
@@ -49,16 +51,24 @@ const std::string FONT_FILEPATH = "./res/fonts/BAHNSCHRIFT 1.TTF";
 // Start Menu Scene
 int Application::StartMenuScene() {
 
+    // load a font
     sf::Font bahnschrift;
     bahnschrift.loadFromFile(FONT_FILEPATH);
+
+    // reset score
+    score = 0;
 
     Sprite sprite_startButton;
     sprite_startButton.loadTextureFromFile("./res/images/start_button.png");
     sprite_startButton.setPosition(sf::Vector2f(360, 300));
 
+    Sprite sprite_settingsButton;
+    sprite_settingsButton.loadTextureFromFile("./res/images/settings_button.png");
+    sprite_settingsButton.setPosition(sf::Vector2f(360, 450));
+
     Sprite sprite_quitButton;
     sprite_quitButton.loadTextureFromFile("./res/images/quit_button.png");
-    sprite_quitButton.setPosition(sf::Vector2f(360, 400));
+    sprite_quitButton.setPosition(sf::Vector2f(360, 510));
 
     while(window.isOpen()) {
         sf::Event event;
@@ -75,6 +85,11 @@ int Application::StartMenuScene() {
                     // change scene to gameplay
                     return 1;
                 }
+
+                if(sprite_settingsButton.getGlobalBounds().contains((sf::Vector2f)mp)) {
+                    // change to settings scene
+                }
+
                 if(sprite_quitButton.getGlobalBounds().contains((sf::Vector2f)mp)) {
                     // quit application
                     // switch to out of bounds scene
@@ -85,6 +100,7 @@ int Application::StartMenuScene() {
 
         window.clear();
         sprite_startButton.draw(window);
+        sprite_settingsButton.draw(window);
         sprite_quitButton.draw(window);
         window.display();
     }
