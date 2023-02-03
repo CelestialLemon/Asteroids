@@ -5,6 +5,112 @@
 #include <iostream>
 #include <string>
 
+Application::Application(int resX, int resY) 
+    : window(sf::VideoMode(resX, resY), "Asteroids", sf::Style::Close),
+    // start the game always with scene 0
+    currentScene(0),
+    // start the game always with score 0
+    score(0)
+{ srand(time(0)); }
+
+void Application::Run() {
+    
+
+    // when one scene ends, swtich to scene that is currentScene
+    // when one scene ends, that scene function should already have modified currentScene value
+    // so load into that scene
+    // run infinitely until we encounter a scene that does not exist, then close the application
+    while(true) {
+        switch(currentScene) {
+            // start menu
+            case 0:
+            currentScene = StartMenuScene();
+            break;
+
+            // gameplay scene
+            case 1:
+            currentScene = GameplayScene();
+            break;
+
+            // end game scene
+            case 2:
+            break;
+
+            // if switching to scene that does not exist, close application
+            default:
+                window.close();
+                return;
+        }
+    }
+}
+
+// multi scene constants
+const std::string FONT_FILEPATH = "./res/fonts/BAHNSCHRIFT 1.TTF";
+
+// -------------------------------------------------------------------------------------------------------
+// Start Menu Scene
+int Application::StartMenuScene() {
+
+    // load a font
+    sf::Font bahnschrift;
+    bahnschrift.loadFromFile(FONT_FILEPATH);
+
+    // reset score
+    score = 0;
+
+    Sprite sprite_startButton;
+    sprite_startButton.loadTextureFromFile("./res/images/start_button.png");
+    sprite_startButton.setPosition(sf::Vector2f(360, 300));
+
+    Sprite sprite_settingsButton;
+    sprite_settingsButton.loadTextureFromFile("./res/images/settings_button.png");
+    sprite_settingsButton.setPosition(sf::Vector2f(360, 450));
+
+    Sprite sprite_quitButton;
+    sprite_quitButton.loadTextureFromFile("./res/images/quit_button.png");
+    sprite_quitButton.setPosition(sf::Vector2f(360, 510));
+
+    while(window.isOpen()) {
+        sf::Event event;
+        while(window.pollEvent(event)) {
+            if(event.type == sf::Event::Closed)
+            {
+                window.close();
+                return -1;
+            }
+            
+            if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+                auto mp = sf::Mouse::getPosition(window);
+                if(sprite_startButton.getGlobalBounds().contains((sf::Vector2f)mp)) {
+                    // change scene to gameplay
+                    return 1;
+                }
+
+                if(sprite_settingsButton.getGlobalBounds().contains((sf::Vector2f)mp)) {
+                    // change to settings scene
+                }
+
+                if(sprite_quitButton.getGlobalBounds().contains((sf::Vector2f)mp)) {
+                    // quit application
+                    // switch to out of bounds scene
+                    return -1;
+                }
+            }
+        }
+
+        window.clear();
+        sprite_startButton.draw(window);
+        sprite_settingsButton.draw(window);
+        sprite_quitButton.draw(window);
+        window.display();
+    }
+}
+
+// -------------------------------------------------------------------------------------------------------
+// Gameplay Scene
+// one asteroid will spawn after these many seconds
+const float ASTEROID_SPAWN_SPEED = 1.0f;
+
 static void normalize(sf::Vector2f& vec) {
     float magnitude = sqrtf((vec.x * vec.x) + (vec.y * vec.y));
 
@@ -35,12 +141,8 @@ static float cartesianAngle(const sf::Vector2f& vec) {
     return angle;
 }
 
-Application::Application(int resX, int resY) 
-    : window(sf::VideoMode(resX, resY), "Asteroids", sf::Style::Close)
-{ srand(time(0)); }
+int Application::GameplayScene() {
 
-void Application::Run() {
-    
     Sprite sprite_staryBackground;
 
     // load a random background from 6 backgrounds
@@ -58,9 +160,7 @@ void Application::Run() {
     // holds all the instantiated asteroids in the scene
     std::unordered_set<Asteroid*> asteroids;
 
-    // spawn an asteroid every 1.0f seconds
-    const float spawnSpeed = 1.0f;
-    float timeSinceLastAsteroidSpawn = spawnSpeed;
+    float timeSinceLastAsteroidSpawn = ASTEROID_SPAWN_SPEED;
    
     sf::Clock clock;
     while (window.isOpen())
@@ -69,7 +169,10 @@ void Application::Run() {
         while (window.pollEvent(event))
         {
             if (event.type == sf::Event::Closed)
+            {
                 window.close();
+                return -1;
+            }
         }
 
         // close the application if escape is pressed
@@ -81,7 +184,7 @@ void Application::Run() {
 
         // ----------------------------------------------------------------------------------------------------
         // Asteroid spawn logic
-        if(timeSinceLastAsteroidSpawn >= spawnSpeed) {
+        if(timeSinceLastAsteroidSpawn >= ASTEROID_SPAWN_SPEED) {
             
             // get a random number from 0-2 for spawning asteroid
             int randAsteroidSize = rand() % 3;
@@ -121,7 +224,8 @@ void Application::Run() {
         // auto bounds = player.getGlobalBounds();
         // printf("Bounds, left: %.2f, top: %.2f\n", bounds.left, bounds.top);
         //window.draw(asteroid);
-        if(player.AsteroidSpaceshipCollision(asteroids)) window.close();
+        // change scene to -1 to close the game
+        if(player.AsteroidSpaceshipCollision(asteroids)) return -1;
 
         window.display();
 
@@ -170,3 +274,5 @@ void Application::Run() {
         }
     }
 }
+
+// -------------------------------------------------------------------------------------------------------
