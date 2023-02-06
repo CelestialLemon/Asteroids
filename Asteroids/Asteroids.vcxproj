@@ -162,6 +162,7 @@
     <ClCompile Include="src\Rigidbody.cpp" />
     <ClCompile Include="src\Spaceship.cpp" />
     <ClCompile Include="src\Sprite.cpp" />
+    <ClCompile Include="src\Text.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Application.h" />
@@ -170,6 +171,7 @@
     <ClInclude Include="src\Rigidbody.h" />
     <ClInclude Include="src\Spaceship.h" />
     <ClInclude Include="src\Sprite.h" />
+    <ClInclude Include="src\Text.h" />
     <ClInclude Include="src\VectorHelper.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -16,4 +16,5 @@ public:
 
     int StartMenuScene();
     int GameplayScene();
+    int GameOverScene();
 };
