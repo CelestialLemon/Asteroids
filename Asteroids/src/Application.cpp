@@ -2,6 +2,7 @@
 #include "Spaceship.h"
 #include "Bullet.h"
 #include "Asteroid.h"
+#include "Text.h"
 #include <iostream>
 #include <string>
 
@@ -34,6 +35,7 @@ void Application::Run() {
 
             // end game scene
             case 2:
+            currentScene = GameOverScene();
             break;
 
             // if switching to scene that does not exist, close application
@@ -225,7 +227,8 @@ int Application::GameplayScene() {
         // printf("Bounds, left: %.2f, top: %.2f\n", bounds.left, bounds.top);
         //window.draw(asteroid);
         // change scene to -1 to close the game
-        if(player.AsteroidSpaceshipCollision(asteroids)) return -1;
+        // change scene to 2 to change to game over scene
+        if(player.AsteroidSpaceshipCollision(asteroids)) return 2;
 
         window.display();
 
@@ -276,3 +279,40 @@ int Application::GameplayScene() {
 }
 
 // -------------------------------------------------------------------------------------------------------
+// End game scene
+
+int Application::GameOverScene() {
+    sf::Font upheavtt;
+    upheavtt.loadFromFile("./res/fonts/upheavtt.TTF");
+
+    Text text_gameOver("Gameover", upheavtt, 64);
+    text_gameOver.SetLetterSpacing(2.0f);
+
+    // add some offset to properly align the text
+    text_gameOver.SetPosition(sf::Vector2f(360, 240) - sf::Vector2f(30, 0));
+
+    Text text_finalScore("Final Score:", upheavtt, 40);
+    text_finalScore.SetLetterSpacing(1.0f);
+    text_finalScore.SetPosition(sf::Vector2f(360, 360));
+
+    Text text_finalScoreValue(std::to_string(score), upheavtt, 64);
+    text_finalScoreValue.SetLetterSpacing(2.0f);
+    text_finalScoreValue.SetPosition(sf::Vector2f(360, 420));
+
+    while(window.isOpen()) {
+        sf::Event event;
+        while(window.pollEvent(event)) {
+            if(event.type == sf::Event::Closed)
+            {
+                window.close();
+                return -1;
+            }
+        }
+
+        window.clear();
+        text_gameOver.draw(window);
+        text_finalScore.draw(window);
+        text_finalScoreValue.draw(window);
+        window.display();
+    }
+}
