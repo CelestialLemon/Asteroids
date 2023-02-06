@@ -264,6 +264,10 @@ float Asteroid::GetHitpoints() const {
     return m_currentHitpoints;
 }
 
+float Asteroid::GetMaxHitpoints() const {
+    return m_maxHitpoints;
+}
+
 sf::Vector2f Asteroid::GetVelocity() const {
     return m_rigidbody.GetVelocity();
 }

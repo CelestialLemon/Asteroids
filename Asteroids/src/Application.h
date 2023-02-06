@@ -8,6 +8,9 @@ class Application{
     // keep track of which scene is active, also used for switching scenes
     int currentScene;
 
+    // font used throught the game
+    sf::Font upheavtt;
+
     // keep track of current score
     size_t score;
 public:

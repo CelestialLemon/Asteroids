@@ -9,10 +9,14 @@
 Application::Application(int resX, int resY) 
     : window(sf::VideoMode(resX, resY), "Asteroids", sf::Style::Close),
     // start the game always with scene 0
-    currentScene(2),
+    currentScene(0),
     // start the game always with score 0
     score(0)
-{ srand(time(0)); }
+    // load the font from file
+{ 
+    srand(time(0));
+    upheavtt.loadFromFile("./res/fonts/upheavtt.ttf");     
+}
 
 void Application::Run() {
     
@@ -56,9 +60,6 @@ int Application::StartMenuScene() {
     // load a font
     sf::Font bahnschrift;
     bahnschrift.loadFromFile(FONT_FILEPATH);
-
-    // reset score
-    score = 0;
 
     Sprite sprite_startButton;
     sprite_startButton.loadTextureFromFile("./res/images/start_button.png");
@@ -145,8 +146,10 @@ static float cartesianAngle(const sf::Vector2f& vec) {
 
 int Application::GameplayScene() {
 
-    Sprite sprite_staryBackground;
+    // reset score
+    score = 0;
 
+    Sprite sprite_staryBackground;
     // load a random background from 6 backgrounds
     short backgroundNum = rand() % 6 + 1;
     std::string backgroundFileName = "./res/images/background_0" + std::to_string(backgroundNum) + ".png";
@@ -158,6 +161,12 @@ int Application::GameplayScene() {
     Spaceship player;
     player.loadTextureFromFile("./res/images/spaceship_02.png");
     player.setPosition(sf::Vector2f(360, 360));
+
+
+    Text text_score(std::to_string(score), upheavtt, 48);
+    text_score.SetLetterSpacing(1.5f);
+    text_score.SetPosition(sf::Vector2f(80, 10));
+
 
     // holds all the instantiated asteroids in the scene
     std::unordered_set<Asteroid*> asteroids;
@@ -230,6 +239,10 @@ int Application::GameplayScene() {
         // change scene to 2 to change to game over scene
         if(player.AsteroidSpaceshipCollision(asteroids)) return 2;
 
+        // score should show on top of everything so render last
+        text_score.SetString(std::to_string(score));
+        text_score.draw(window);
+
         window.display();
 
 
@@ -243,6 +256,10 @@ int Application::GameplayScene() {
             // if asteroid has reached 0 hitpoints, we need to destroy it
             if(asteroid->GetHitpoints() <= 0) {
                 toDelete.push_back(asteroid);
+
+                // since the asteroid is destroyed add its max hitpoints to score
+                score += asteroid->GetMaxHitpoints();
+
                 // if a large asteroid was destroyed by reaching 0 hitpoints, spawn 2 small ones
                 if(asteroid->GetAsteroidSize() == AsteroidSize::LARGE) {
 
@@ -282,8 +299,6 @@ int Application::GameplayScene() {
 // End game scene
 
 int Application::GameOverScene() {
-    sf::Font upheavtt;
-    upheavtt.loadFromFile("./res/fonts/upheavtt.TTF");
 
     Text text_gameOver("Gameover", upheavtt, 64);
     text_gameOver.SetLetterSpacing(2.0f);
