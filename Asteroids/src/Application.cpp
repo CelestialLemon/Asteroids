@@ -9,7 +9,7 @@
 Application::Application(int resX, int resY) 
     : window(sf::VideoMode(resX, resY), "Asteroids", sf::Style::Close),
     // start the game always with scene 0
-    currentScene(0),
+    currentScene(Scene::START_MENU_SCENE),
     // start the game always with score 0
     score(0)
     // load the font from file
@@ -28,17 +28,17 @@ void Application::Run() {
     while(true) {
         switch(currentScene) {
             // start menu
-            case 0:
+            case Scene::START_MENU_SCENE:
             currentScene = StartMenuScene();
             break;
 
             // gameplay scene
-            case 1:
+            case Scene::GAMEPLAY_SCENE:
             currentScene = GameplayScene();
             break;
 
             // end game scene
-            case 2:
+            case Scene::GAME_OVER_SCENE:
             currentScene = GameOverScene();
             break;
 
@@ -55,7 +55,7 @@ const std::string FONT_FILEPATH = "./res/fonts/BAHNSCHRIFT 1.TTF";
 
 // -------------------------------------------------------------------------------------------------------
 // Start Menu Scene
-int Application::StartMenuScene() {
+Scene Application::StartMenuScene() {
 
     // load a font
     sf::Font bahnschrift;
@@ -79,14 +79,14 @@ int Application::StartMenuScene() {
             if(event.type == sf::Event::Closed)
             {
                 window.close();
-                return -1;
+                return Scene::UNDEFINED_SCENE;
             }
             
             if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
                 auto mp = sf::Mouse::getPosition(window);
                 if(text_start.GetGlobalBounds().contains((sf::Vector2f)mp)) {
                     // change scene to gameplay
-                    return 1;
+                    return Scene::GAMEPLAY_SCENE;
                 }
 
                 if(text_settings.GetGlobalBounds().contains((sf::Vector2f)mp)) {
@@ -96,7 +96,7 @@ int Application::StartMenuScene() {
                 if(text_quit.GetGlobalBounds().contains((sf::Vector2f)mp)) {
                     // quit application
                     // switch to out of bounds scene
-                    return -1;
+                    return Scene::UNDEFINED_SCENE;
                 }
             }
         }
@@ -144,7 +144,7 @@ static float cartesianAngle(const sf::Vector2f& vec) {
     return angle;
 }
 
-int Application::GameplayScene() {
+Scene Application::GameplayScene() {
 
     // reset score
     score = 0;
@@ -182,7 +182,7 @@ int Application::GameplayScene() {
             if (event.type == sf::Event::Closed)
             {
                 window.close();
-                return -1;
+                return Scene::UNDEFINED_SCENE;
             }
         }
 
@@ -237,7 +237,7 @@ int Application::GameplayScene() {
         //window.draw(asteroid);
         // change scene to -1 to close the game
         // change scene to 2 to change to game over scene
-        if(player.AsteroidSpaceshipCollision(asteroids)) return 2;
+        if(player.AsteroidSpaceshipCollision(asteroids)) return Scene::GAME_OVER_SCENE;
 
         // score should show on top of everything so render last
         text_score.SetString(std::to_string(score));
@@ -298,7 +298,7 @@ int Application::GameplayScene() {
 // -------------------------------------------------------------------------------------------------------
 // End game scene
 
-int Application::GameOverScene() {
+Scene Application::GameOverScene() {
 
     Text text_gameOver("Gameover", upheavtt, 64);
     text_gameOver.SetLetterSpacing(2.0f);
@@ -327,7 +327,7 @@ int Application::GameOverScene() {
             if(event.type == sf::Event::Closed)
             {
                 window.close();
-                return -1;
+                return Scene::UNDEFINED_SCENE;
             }
         }
 
@@ -335,12 +335,12 @@ int Application::GameOverScene() {
             auto mp = sf::Mouse::getPosition(window);
             if(text_playAgain.GetGlobalBounds().contains((sf::Vector2f)mp)) {
                 // change to gameplay scene
-                return 1;
+                return Scene::GAMEPLAY_SCENE;
             }
 
             if(text_startMenu.GetGlobalBounds().contains((sf::Vector2f)mp)) {
                 // change to start menu scene
-                return 0;
+                return Scene::START_MENU_SCENE;
             }            
         }
 

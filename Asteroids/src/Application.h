@@ -2,11 +2,19 @@
 
 #include "SFML/Graphics.hpp"
 
+// switch to undefined scene to close game
+enum Scene {
+    UNDEFINED_SCENE = -1,
+    START_MENU_SCENE = 0,
+    GAMEPLAY_SCENE = 1,
+    GAME_OVER_SCENE = 2
+};
+
 class Application{
     // window for rendering
     sf::RenderWindow window;
     // keep track of which scene is active, also used for switching scenes
-    int currentScene;
+    Scene currentScene;
 
     // font used throught the game
     sf::Font upheavtt;
@@ -17,7 +25,7 @@ public:
     Application(int resX, int resY);
     void Run();
 
-    int StartMenuScene();
-    int GameplayScene();
-    int GameOverScene();
+    Scene StartMenuScene();
+    Scene GameplayScene();
+    Scene GameOverScene();
 };
