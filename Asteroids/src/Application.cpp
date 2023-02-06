@@ -61,17 +61,17 @@ int Application::StartMenuScene() {
     sf::Font bahnschrift;
     bahnschrift.loadFromFile(FONT_FILEPATH);
 
-    Sprite sprite_startButton;
-    sprite_startButton.loadTextureFromFile("./res/images/start_button.png");
-    sprite_startButton.setPosition(sf::Vector2f(360, 300));
+    Text text_start("Start", upheavtt, 100);
+    text_start.SetLetterSpacing(2.0f);
+    text_start.SetPosition(sf::Vector2f(360, 250) - sf::Vector2f(20, 0));
 
-    Sprite sprite_settingsButton;
-    sprite_settingsButton.loadTextureFromFile("./res/images/settings_button.png");
-    sprite_settingsButton.setPosition(sf::Vector2f(360, 450));
+    Text text_settings("Settings", upheavtt, 48);
+    text_settings.SetLetterSpacing(1.5f);
+    text_settings.SetPosition(sf::Vector2f(360, 400) - sf::Vector2f(10, 0));
 
-    Sprite sprite_quitButton;
-    sprite_quitButton.loadTextureFromFile("./res/images/quit_button.png");
-    sprite_quitButton.setPosition(sf::Vector2f(360, 510));
+    Text text_quit("Quit", upheavtt, 48);
+    text_quit.SetLetterSpacing(1.5f);
+    text_quit.SetPosition(sf::Vector2f(360, 460) - sf::Vector2f(10, 0));
 
     while(window.isOpen()) {
         sf::Event event;
@@ -84,16 +84,16 @@ int Application::StartMenuScene() {
             
             if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
                 auto mp = sf::Mouse::getPosition(window);
-                if(sprite_startButton.getGlobalBounds().contains((sf::Vector2f)mp)) {
+                if(text_start.GetGlobalBounds().contains((sf::Vector2f)mp)) {
                     // change scene to gameplay
                     return 1;
                 }
 
-                if(sprite_settingsButton.getGlobalBounds().contains((sf::Vector2f)mp)) {
+                if(text_settings.GetGlobalBounds().contains((sf::Vector2f)mp)) {
                     // change to settings scene
                 }
 
-                if(sprite_quitButton.getGlobalBounds().contains((sf::Vector2f)mp)) {
+                if(text_quit.GetGlobalBounds().contains((sf::Vector2f)mp)) {
                     // quit application
                     // switch to out of bounds scene
                     return -1;
@@ -102,9 +102,9 @@ int Application::StartMenuScene() {
         }
 
         window.clear();
-        sprite_startButton.draw(window);
-        sprite_settingsButton.draw(window);
-        sprite_quitButton.draw(window);
+        text_start.draw(window);
+        text_settings.draw(window);
+        text_quit.draw(window);
         window.display();
     }
 }
@@ -303,9 +303,9 @@ int Application::GameOverScene() {
     Text text_gameOver("Gameover", upheavtt, 64);
     text_gameOver.SetLetterSpacing(2.0f);
     // add some offset to properly align the text
-    text_gameOver.SetPosition(sf::Vector2f(360, 180) - sf::Vector2f(30, 0));
+    text_gameOver.SetPosition(sf::Vector2f(360, 180) - sf::Vector2f(20, 0));
 
-    Text text_finalScore("Final Score:", upheavtt, 40);
+    Text text_finalScore("Final Score", upheavtt, 40);
     text_finalScore.SetLetterSpacing(1.0f);
     text_finalScore.SetPosition(sf::Vector2f(360, 320));
 
