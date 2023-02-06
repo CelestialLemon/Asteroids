@@ -8,5 +8,7 @@ class Text {
     void SetLetterSpacing(float letterSpacing);
     void SetPosition(sf::Vector2f pos);
 
+    sf::FloatRect GetGlobalBounds() const;
+
     void draw(sf::RenderWindow& window);
 };

@@ -16,6 +16,10 @@ void Text::SetPosition(sf::Vector2f pos) {
     m_text.setPosition(pos);
 }
 
+sf::FloatRect Text::GetGlobalBounds() const {
+    return m_text.getGlobalBounds();
+}
+
 void Text::draw(sf::RenderWindow& window) {
     window.draw(m_text);
 }
