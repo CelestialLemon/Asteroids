@@ -5,6 +5,7 @@ class Text {
 
     public:
     Text(const std::string& text, const sf::Font& font ,size_t fontSize);
+    void SetString(const std::string& _string);
     void SetLetterSpacing(float letterSpacing);
     void SetPosition(sf::Vector2f pos);
 

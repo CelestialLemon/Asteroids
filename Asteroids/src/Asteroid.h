@@ -63,6 +63,7 @@ class Asteroid {
     void Hit(float damage);
 
     float GetHitpoints() const;
+    float GetMaxHitpoints() const;
     AsteroidSize GetAsteroidSize() const;
     sf::ConvexShape GetConvexShape() const;
     sf::Vector2f GetPosition() const;

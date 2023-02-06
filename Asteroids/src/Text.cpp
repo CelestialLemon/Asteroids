@@ -8,6 +8,10 @@ Text::Text(const std::string& text, const sf::Font& font, size_t fontSize)
     m_text.setOrigin(textRect.width / 2, textRect.height / 2);
 }
 
+void Text::SetString(const std::string& _string) {
+    m_text.setString(_string);
+}
+
 void Text::SetLetterSpacing(float letterSpacing) {
     m_text.setLetterSpacing(letterSpacing);
 }
