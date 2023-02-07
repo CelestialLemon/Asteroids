@@ -53,6 +53,9 @@ class Spaceship : public Sprite {
 
     // update the rotation depending on mouse position
     void updateRotation(float dt, sf::Vector2f mousePosition);
+
+    // set volume for all the sound effects and music managed by this class
+    void SetVolumes(const float MASTER_VOLUME, const float SFX_VOLUME, const float MUSIC_VOLUME);
     
     // take input from user to move the spaceship
     void update(float dt, sf::RenderWindow& window) override;

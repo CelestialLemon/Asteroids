@@ -28,8 +28,13 @@ Spaceship::Spaceship()
     // setup sounds
     soundBuffer_fire.loadFromFile("./res/audio/sfx/LaserShot.wav");
     sound_fire.setBuffer(soundBuffer_fire);
-    sound_fire.setVolume(25.0f);
 }
+
+void Spaceship::SetVolumes(const float MASTER_VOLUME, const float SFX_VOLUME, const float MUSIC_VOLUME) {
+    // set music and sfx volumes
+    sound_fire.setVolume(100.0f * MASTER_VOLUME * SFX_VOLUME);
+}
+
 
 // update the position of the ship by calculating next position given currentPos and velocity and dt
 void Spaceship::updatePosition(float dt) {

@@ -3,8 +3,16 @@
 #include "Bullet.h"
 #include "Asteroid.h"
 #include "Text.h"
+
+#include "utility.h"
+#include "json.hpp"
+
 #include <iostream>
 #include <string>
+#include <fstream>
+#include <filesystem>
+
+const std::string DATA_FILE_PATH = "./res/data/data.json";
 
 Application::Application(int resX, int resY) 
     : window(sf::VideoMode(resX, resY), "Asteroids", sf::Style::Close),
@@ -12,10 +20,60 @@ Application::Application(int resX, int resY)
     currentScene(Scene::START_MENU_SCENE),
     // start the game always with score 0
     score(0)
-    // load the font from file
+    // volumes will be initialized after reading data from file
+    // if file doesn't exist they will revert to default values
 { 
     srand(time(0));
-    upheavtt.loadFromFile("./res/fonts/upheavtt.ttf");     
+    // load the font from file
+    upheavtt.loadFromFile("./res/fonts/upheavtt.ttf"); 
+    
+    // if data file exists, load the data
+    if(std::filesystem::exists(DATA_FILE_PATH)) {
+        loadData();
+    }
+    // if data file does not exist, reset attributes to default values
+    // then create data file and save these values
+    else {
+        resetData();
+        saveData();
+    }
+}
+
+void Application::loadData() {
+    // open the data file
+    std::ifstream dataInputStream(DATA_FILE_PATH);
+
+    // read data and parse as json
+    nlohmann::json data;
+    dataInputStream >> data;
+
+    // read attributes from json
+    MASTER_VOLUME = data["MASTER_VOLUME"];
+    SFX_VOLUME = data["SFX_VOLUME"];
+    MUSIC_VOLUME = data["MUSIC_VOLUME"];
+}
+
+void Application::resetData() {
+    // set default values for attributes
+    MASTER_VOLUME = 1.0f;
+    SFX_VOLUME = 1.0f;
+    MUSIC_VOLUME = 1.0f;
+}
+
+void Application::saveData() {
+    // create json
+    nlohmann::json data;
+
+    // write data to json object
+    data["MASTER_VOLUME"] = MASTER_VOLUME;
+    data["SFX_VOLUME"] = SFX_VOLUME;
+    data["MUSIC_VOLUME"] = MUSIC_VOLUME;
+
+    // open file to write
+    std::ofstream o(DATA_FILE_PATH);
+    // save data in file
+    // setw(4) is to prettify it
+    o << std::setw(4) << data << std::endl;
 }
 
 void Application::Run() {
@@ -42,6 +100,11 @@ void Application::Run() {
             currentScene = GameOverScene();
             break;
 
+            // settings menu scene
+            case Scene::SETTINGS_SCENE:
+            currentScene = SettingsScene();
+            break;
+
             // if switching to scene that does not exist, close application
             default:
                 window.close();
@@ -60,7 +123,8 @@ Scene Application::StartMenuScene() {
     // load music
     sf::Music music_background;
     music_background.openFromFile("./res/audio/music/DeepSpaceA.wav");
-    music_background.setVolume(20.0f);
+    // 100 is the default volume
+    music_background.setVolume(100.0f * MASTER_VOLUME * MUSIC_VOLUME);
     music_background.setLoop(true);
     music_background.play();
 
@@ -94,6 +158,7 @@ Scene Application::StartMenuScene() {
 
                 if(text_settings.GetGlobalBounds().contains((sf::Vector2f)mp)) {
                     // change to settings scene
+                    return Scene::SETTINGS_SCENE;
                 }
 
                 if(text_quit.GetGlobalBounds().contains((sf::Vector2f)mp)) {
@@ -108,6 +173,171 @@ Scene Application::StartMenuScene() {
         text_start.draw(window);
         text_settings.draw(window);
         text_quit.draw(window);
+        window.display();
+    }
+}
+
+// -------------------------------------------------------------------------------------------------------
+// Settings Scene
+// when increaser or reducer is held down the value of master volume changes by this value per second
+const float VOLUME_CHANGE_SPEED = 0.1f;
+
+Scene Application::SettingsScene() {
+
+    Text text_settingsTitle("Settings", upheavtt, 80);
+    text_settingsTitle.SetLetterSpacing(2.0f);
+    text_settingsTitle.SetPosition(sf::Vector2f(360, 100) - sf::Vector2f(20, 0));
+
+    // ---------------------------------------------
+    // master volume
+    Text text_masterVolumeLabel("Master Volume", upheavtt, 36);
+    text_masterVolumeLabel.SetLetterSpacing(1.0f);
+    text_masterVolumeLabel.SetPosition(sf::Vector2f(180, 250));
+
+    Text text_masterVolumeValue(to_string_with_precision(MASTER_VOLUME), upheavtt, 36);
+    text_masterVolumeValue.SetLetterSpacing(1.0f);
+    text_masterVolumeValue.SetPosition(sf::Vector2f(600, 250));
+
+    Text text_masterVolumeReducer("<", upheavtt, 36);
+    text_masterVolumeReducer.SetPosition(sf::Vector2f(540, 250));
+
+    Text text_masterVolumeIncreaser(">", upheavtt, 36);
+    text_masterVolumeIncreaser.SetPosition(sf::Vector2f(660, 250));
+
+    // ---------------------------------------------
+    // sfx volume
+
+    Text text_sfxVolumeLabel("Sfx Volume", upheavtt, 36);
+    text_sfxVolumeLabel.SetLetterSpacing(1.0f);
+    text_sfxVolumeLabel.SetPosition(sf::Vector2f(180, 300));
+
+    Text text_sfxVolumeValue(to_string_with_precision(SFX_VOLUME), upheavtt, 36);
+    text_sfxVolumeValue.SetLetterSpacing(1.0f);
+    text_sfxVolumeValue.SetPosition(sf::Vector2f(600, 300));
+
+    Text text_sfxVolumeReducer("<", upheavtt, 36);
+    text_sfxVolumeReducer.SetPosition(sf::Vector2f(540, 300));
+
+    Text text_sfxVolumeIncreaser(">", upheavtt, 36);
+    text_sfxVolumeIncreaser.SetPosition(sf::Vector2f(660, 300));
+
+    // ---------------------------------------------
+    // music volume
+
+    Text text_musicVolumeLabel("Music Volume", upheavtt, 36);
+    text_musicVolumeLabel.SetLetterSpacing(1.0f);
+    text_musicVolumeLabel.SetPosition(sf::Vector2f(180, 350));
+
+    Text text_musicVolumeValue(to_string_with_precision(MUSIC_VOLUME), upheavtt, 36);
+    text_musicVolumeValue.SetLetterSpacing(1.0f);
+    text_musicVolumeValue.SetPosition(sf::Vector2f(600, 350));
+
+    Text text_musicVolumeReducer("<", upheavtt, 36);
+    text_musicVolumeReducer.SetPosition(sf::Vector2f(540, 350));
+
+    Text text_musicVolumeIncreaser(">", upheavtt, 36);
+    text_musicVolumeIncreaser.SetPosition(sf::Vector2f(660, 350));
+
+    Text text_goBackButton("< Go Back", upheavtt, 48);
+    text_goBackButton.SetLetterSpacing(1.0f);
+    text_goBackButton.SetPosition(sf::Vector2f(360.0f, 600));
+
+    // render loop
+
+    sf::Clock clock;
+    while(window.isOpen()) {
+        sf::Event event;
+        while(window.pollEvent(event)) {
+            if(event.type == sf::Event::Closed)
+            {
+                window.close();
+                return Scene::UNDEFINED_SCENE;
+            }
+        }
+
+        const float dt = clock.restart().asSeconds();
+
+        // detect clicks and performs actions for the events
+        if(sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
+            auto mp = sf::Mouse::getPosition(window);
+
+            // reduce master volume button
+            if(text_masterVolumeReducer.GetGlobalBounds().contains((sf::Vector2f)mp)) {
+                MASTER_VOLUME -= VOLUME_CHANGE_SPEED * dt;
+            }
+
+            // increase master volume button
+            else if(text_masterVolumeIncreaser.GetGlobalBounds().contains((sf::Vector2f)mp)) {
+                MASTER_VOLUME += VOLUME_CHANGE_SPEED * dt;
+            }
+
+            // reduce sfx volume button
+            else if(text_sfxVolumeReducer.GetGlobalBounds().contains((sf::Vector2f)mp)) {
+                SFX_VOLUME -= VOLUME_CHANGE_SPEED * dt;
+            }
+
+            // increase sfx volume button
+            else if(text_sfxVolumeIncreaser.GetGlobalBounds().contains((sf::Vector2f)mp)) {
+                SFX_VOLUME += VOLUME_CHANGE_SPEED * dt;
+            }
+
+            // reduce music volume button
+            else if(text_musicVolumeReducer.GetGlobalBounds().contains((sf::Vector2f)mp)) {
+                MUSIC_VOLUME -= VOLUME_CHANGE_SPEED * dt;
+            }
+
+            // increase music volume button
+            else if(text_musicVolumeIncreaser.GetGlobalBounds().contains((sf::Vector2f)mp)) {
+                MUSIC_VOLUME += VOLUME_CHANGE_SPEED * dt;
+            }
+
+            // go back to start menu button
+            else if(text_goBackButton.GetGlobalBounds().contains((sf::Vector2f)mp)) {
+                // save the changes made
+                saveData();
+                return Scene::START_MENU_SCENE;
+            }
+
+            // clamp volumes between 0 and 1
+            MASTER_VOLUME = std::clamp(MASTER_VOLUME, 0.0f, 1.0f);
+            SFX_VOLUME = std::clamp(SFX_VOLUME, 0.0f, 1.0f);
+            MUSIC_VOLUME = std::clamp(MUSIC_VOLUME, 0.0f, 1.0f);
+        }
+
+        // updates
+        
+        // update strings for value texts
+        text_masterVolumeValue.SetString(to_string_with_precision(MASTER_VOLUME));
+        text_sfxVolumeValue.SetString(to_string_with_precision(SFX_VOLUME));
+        text_musicVolumeValue.SetString(to_string_with_precision(MUSIC_VOLUME));
+
+
+        window.clear();
+        
+        // draw here
+
+        text_settingsTitle.draw(window);
+
+        // master volume
+        text_masterVolumeLabel.draw(window);
+        text_masterVolumeValue.draw(window);
+        text_masterVolumeReducer.draw(window);
+        text_masterVolumeIncreaser.draw(window);
+
+        // sfx volume
+        text_sfxVolumeLabel.draw(window);
+        text_sfxVolumeValue.draw(window);
+        text_sfxVolumeReducer.draw(window);
+        text_sfxVolumeIncreaser.draw(window);
+
+        // music volume
+        text_musicVolumeLabel.draw(window);
+        text_musicVolumeValue.draw(window);
+        text_musicVolumeReducer.draw(window);
+        text_musicVolumeIncreaser.draw(window);
+
+        text_goBackButton.draw(window);
+
         window.display();
     }
 }
@@ -166,24 +396,29 @@ Scene Application::GameplayScene() {
     Spaceship player;
     player.loadTextureFromFile("./res/images/spaceship_02.png");
     player.setPosition(sf::Vector2f(360, 360));
+    player.SetVolumes(MASTER_VOLUME, SFX_VOLUME, MUSIC_VOLUME);
 
     // load audio
     sf::SoundBuffer soundBuffer_asteroidExplosionSmall;
     soundBuffer_asteroidExplosionSmall.loadFromFile("./res/audio/sfx/Explosion9.wav");
     sf::Sound sound_asteroidExplosionSmall(soundBuffer_asteroidExplosionSmall);
+    sound_asteroidExplosionSmall.setVolume(100.0f * MASTER_VOLUME * SFX_VOLUME);
 
     sf::SoundBuffer soundBuffer_asteroidExplosionLarge;
     soundBuffer_asteroidExplosionLarge.loadFromFile("./res/audio/sfx/MiniExplosionChainReaction.wav");
     sf::Sound sound_asteroidExplosionLarge(soundBuffer_asteroidExplosionLarge);
+    sound_asteroidExplosionLarge.setVolume(100.0f * MASTER_VOLUME * SFX_VOLUME);
+
 
     sf::SoundBuffer soundBuffer_death;
     soundBuffer_death.loadFromFile("./res/audio/sfx/TotalBurnOut.wav");
     sf::Sound sound_death(soundBuffer_death);
+    sound_death.setVolume(sound_death.getVolume() * MASTER_VOLUME * SFX_VOLUME);
 
     // initialize container for background music
     // we'll set a random track to play during run time
     sf::Music music_background;
-    music_background.setVolume(20.0f);
+    music_background.setVolume(100.0f * MASTER_VOLUME * MUSIC_VOLUME);
 
     Text text_score(std::to_string(score), upheavtt, 48);
     text_score.SetLetterSpacing(1.5f);
@@ -377,7 +612,7 @@ Scene Application::GameOverScene() {
     // load audio
     sf::Music music_background;
     music_background.openFromFile("./res/audio/music/bgm_26.wav");
-    music_background.setVolume(20.0f);
+    music_background.setVolume(100.0f * MASTER_VOLUME * MUSIC_VOLUME);
     music_background.setLoop(true);
     music_background.play();
 
