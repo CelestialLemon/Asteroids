@@ -65,5 +65,11 @@
     <ClInclude Include="src\Text.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\utility.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vendor\nlohmann\json.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
