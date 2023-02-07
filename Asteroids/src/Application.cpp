@@ -57,9 +57,12 @@ const std::string FONT_FILEPATH = "./res/fonts/BAHNSCHRIFT 1.TTF";
 // Start Menu Scene
 Scene Application::StartMenuScene() {
 
-    // load a font
-    sf::Font bahnschrift;
-    bahnschrift.loadFromFile(FONT_FILEPATH);
+    // load music
+    sf::Music music_background;
+    music_background.openFromFile("./res/audio/music/DeepSpaceA.wav");
+    music_background.setVolume(20.0f);
+    music_background.setLoop(true);
+    music_background.play();
 
     Text text_start("Start", upheavtt, 100);
     text_start.SetLetterSpacing(2.0f);
@@ -149,6 +152,8 @@ Scene Application::GameplayScene() {
     // reset score
     score = 0;
 
+    // load sprites
+
     Sprite sprite_staryBackground;
     // load a random background from 6 backgrounds
     short backgroundNum = rand() % 6 + 1;
@@ -162,6 +167,23 @@ Scene Application::GameplayScene() {
     player.loadTextureFromFile("./res/images/spaceship_02.png");
     player.setPosition(sf::Vector2f(360, 360));
 
+    // load audio
+    sf::SoundBuffer soundBuffer_asteroidExplosionSmall;
+    soundBuffer_asteroidExplosionSmall.loadFromFile("./res/audio/sfx/Explosion9.wav");
+    sf::Sound sound_asteroidExplosionSmall(soundBuffer_asteroidExplosionSmall);
+
+    sf::SoundBuffer soundBuffer_asteroidExplosionLarge;
+    soundBuffer_asteroidExplosionLarge.loadFromFile("./res/audio/sfx/MiniExplosionChainReaction.wav");
+    sf::Sound sound_asteroidExplosionLarge(soundBuffer_asteroidExplosionLarge);
+
+    sf::SoundBuffer soundBuffer_death;
+    soundBuffer_death.loadFromFile("./res/audio/sfx/TotalBurnOut.wav");
+    sf::Sound sound_death(soundBuffer_death);
+
+    // initialize container for background music
+    // we'll set a random track to play during run time
+    sf::Music music_background;
+    music_background.setVolume(20.0f);
 
     Text text_score(std::to_string(score), upheavtt, 48);
     text_score.SetLetterSpacing(1.5f);
@@ -192,6 +214,24 @@ Scene Application::GameplayScene() {
             window.close();
 
         float dt = clock.restart().asSeconds();
+        // ----------------------------------------------------------------------------------------------------
+        // background music logic
+        // select one of random 4 tracks
+        // status, 0 = stopped, 1 = paused, 2 = playing
+        // if previous song has finished playing start playing random
+        // if no song was playing start playing random
+        if(music_background.getStatus() == 0) {
+            // get random number from 0-3
+            size_t randomTrackNumber = rand() % 4;
+
+            // calculate filepath
+            const std::string filepath = "./res/audio/music/DynamicFight" + std::to_string(randomTrackNumber) + ".wav";
+            // set file as source for music
+            music_background.openFromFile(filepath);
+            // play song
+            music_background.play();
+        }
+        
 
         // ----------------------------------------------------------------------------------------------------
         // Asteroid spawn logic
@@ -237,8 +277,11 @@ Scene Application::GameplayScene() {
         //window.draw(asteroid);
         // change scene to -1 to close the game
         // change scene to 2 to change to game over scene
-        if(player.AsteroidSpaceshipCollision(asteroids)) return Scene::GAME_OVER_SCENE;
-
+        if(player.AsteroidSpaceshipCollision(asteroids)) {
+            // TODO: add a small wait so this sound effect can play
+            sound_death.play();
+            return Scene::GAME_OVER_SCENE;
+        }
         // score should show on top of everything so render last
         text_score.SetString(std::to_string(score));
         text_score.draw(window);
@@ -280,6 +323,12 @@ Scene Application::GameplayScene() {
                     sf::Vector2f directionToHurl2(cos(velocityAngle - 0.15), sin(velocityAngle - 0.15));
                     Asteroid* c = new Asteroid(asteroid->GetPosition(), AsteroidSize::SMALL, asteroid->GetPosition() + directionToHurl2, 10e6);
                     toAdd.push_back(c); 
+
+                    sound_asteroidExplosionLarge.play();
+                }
+                else {
+                    // just play explosion sound
+                    sound_asteroidExplosionSmall.play();
                 }
             }
         }
@@ -305,21 +354,32 @@ Scene Application::GameOverScene() {
     // add some offset to properly align the text
     text_gameOver.SetPosition(sf::Vector2f(360, 180) - sf::Vector2f(20, 0));
 
+    // final score text
     Text text_finalScore("Final Score", upheavtt, 40);
     text_finalScore.SetLetterSpacing(1.0f);
     text_finalScore.SetPosition(sf::Vector2f(360, 320));
 
+    // the text displaying the actual number of the score
     Text text_finalScoreValue(std::to_string(score), upheavtt, 64);
     text_finalScoreValue.SetLetterSpacing(2.0f);
     text_finalScoreValue.SetPosition(sf::Vector2f(360, 380));
 
+    // play again button
     Text text_playAgain("Play Again", upheavtt, 48);
     text_playAgain.SetLetterSpacing(1.5f);
     text_playAgain.SetPosition(sf::Vector2f(360, 480));
 
+    // go to start menu button
     Text text_startMenu("Start Menu", upheavtt, 48);
     text_startMenu.SetLetterSpacing(1.5f);
     text_startMenu.SetPosition(sf::Vector2f(360, 540));
+
+    // load audio
+    sf::Music music_background;
+    music_background.openFromFile("./res/audio/music/bgm_26.wav");
+    music_background.setVolume(20.0f);
+    music_background.setLoop(true);
+    music_background.play();
 
     while(window.isOpen()) {
         sf::Event event;

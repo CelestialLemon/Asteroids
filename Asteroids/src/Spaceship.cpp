@@ -24,6 +24,11 @@ Spaceship::Spaceship()
     collider.setPoint(1, sf::Vector2f(-27, 27));
     collider.setPoint(2, sf::Vector2f(-17, 0));
     collider.setPoint(3, sf::Vector2f(-27, -27));
+
+    // setup sounds
+    soundBuffer_fire.loadFromFile("./res/audio/sfx/LaserShot.wav");
+    sound_fire.setBuffer(soundBuffer_fire);
+    sound_fire.setVolume(25.0f);
 }
 
 // update the position of the ship by calculating next position given currentPos and velocity and dt
@@ -105,6 +110,9 @@ void Spaceship::Fire() {
 
         // reset gun charge
         gunCurrentCharge = 0;
+
+        // play audio
+        sound_fire.play();
     }
 }
 

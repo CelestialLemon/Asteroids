@@ -6,6 +6,7 @@
 #include "Bullet.h"
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <vector>
 #include <unordered_set>
 #include <iostream>
@@ -29,6 +30,9 @@ class Spaceship : public Sprite {
 
     // polygon collider for spaceship
     sf::ConvexShape collider;
+    
+    sf::SoundBuffer soundBuffer_fire;
+    sf::Sound sound_fire;
     
     // gun has charge level, increases every second by given speed, fires when reaching maxcharge
     int gunMaxCharge, gunRechargeSpeed;
