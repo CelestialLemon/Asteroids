@@ -179,7 +179,10 @@ Scene Application::GameplayScene() {
     soundBuffer_death.loadFromFile("./res/audio/sfx/TotalBurnOut.wav");
     sf::Sound sound_death(soundBuffer_death);
 
-
+    // initialize container for background music
+    // we'll set a random track to play during run time
+    sf::Music music_background;
+    music_background.setVolume(20.0f);
 
     Text text_score(std::to_string(score), upheavtt, 48);
     text_score.SetLetterSpacing(1.5f);
@@ -210,6 +213,19 @@ Scene Application::GameplayScene() {
             window.close();
 
         float dt = clock.restart().asSeconds();
+        // ----------------------------------------------------------------------------------------------------
+        // background music logic
+        // select one of random 3 tracks
+        // status, 0 = stopped, 1 = paused, 2 = playing
+        if(music_background.getStatus() == 0) {
+            size_t randomTrackNumber = rand() % 3;
+
+            const std::string filepath = "./res/audio/music/DynamicFight" + std::to_string(randomTrackNumber) + ".wav";
+            music_background.openFromFile(filepath);
+            std::cout << "Playing " << filepath << "\n";
+            music_background.play();
+        }
+        
 
         // ----------------------------------------------------------------------------------------------------
         // Asteroid spawn logic
