@@ -57,9 +57,11 @@ const std::string FONT_FILEPATH = "./res/fonts/BAHNSCHRIFT 1.TTF";
 // Start Menu Scene
 Scene Application::StartMenuScene() {
 
-    // load a font
-    sf::Font bahnschrift;
-    bahnschrift.loadFromFile(FONT_FILEPATH);
+    // load music
+    sf::Music music_background;
+    music_background.openFromFile("./res/audio/music/DeepSpaceA.wav");
+    music_background.setLoop(true);
+    music_background.play();
 
     Text text_start("Start", upheavtt, 100);
     text_start.SetLetterSpacing(2.0f);
@@ -149,6 +151,8 @@ Scene Application::GameplayScene() {
     // reset score
     score = 0;
 
+    // load sprites
+
     Sprite sprite_staryBackground;
     // load a random background from 6 backgrounds
     short backgroundNum = rand() % 6 + 1;
@@ -161,6 +165,20 @@ Scene Application::GameplayScene() {
     Spaceship player;
     player.loadTextureFromFile("./res/images/spaceship_02.png");
     player.setPosition(sf::Vector2f(360, 360));
+
+    // load audio
+    sf::SoundBuffer soundBuffer_asteroidExplosionSmall;
+    soundBuffer_asteroidExplosionSmall.loadFromFile("./res/audio/sfx/Explosion9.wav");
+    sf::Sound sound_asteroidExplosionSmall(soundBuffer_asteroidExplosionSmall);
+
+    sf::SoundBuffer soundBuffer_asteroidExplosionLarge;
+    soundBuffer_asteroidExplosionLarge.loadFromFile("./res/audio/sfx/MiniExplosionChainReaction.wav");
+    sf::Sound sound_asteroidExplosionLarge(soundBuffer_asteroidExplosionLarge);
+
+    sf::SoundBuffer soundBuffer_death;
+    soundBuffer_death.loadFromFile("./res/audio/sfx/TotalBurnOut.wav");
+    sf::Sound sound_death(soundBuffer_death);
+
 
 
     Text text_score(std::to_string(score), upheavtt, 48);
@@ -237,8 +255,11 @@ Scene Application::GameplayScene() {
         //window.draw(asteroid);
         // change scene to -1 to close the game
         // change scene to 2 to change to game over scene
-        if(player.AsteroidSpaceshipCollision(asteroids)) return Scene::GAME_OVER_SCENE;
-
+        if(player.AsteroidSpaceshipCollision(asteroids)) {
+            // TODO: add a small wait so this sound effect can play
+            sound_death.play();
+            return Scene::GAME_OVER_SCENE;
+        }
         // score should show on top of everything so render last
         text_score.SetString(std::to_string(score));
         text_score.draw(window);
@@ -280,6 +301,12 @@ Scene Application::GameplayScene() {
                     sf::Vector2f directionToHurl2(cos(velocityAngle - 0.15), sin(velocityAngle - 0.15));
                     Asteroid* c = new Asteroid(asteroid->GetPosition(), AsteroidSize::SMALL, asteroid->GetPosition() + directionToHurl2, 10e6);
                     toAdd.push_back(c); 
+
+                    sound_asteroidExplosionLarge.play();
+                }
+                else {
+                    // just play explosion sound
+                    sound_asteroidExplosionSmall.play();
                 }
             }
         }
