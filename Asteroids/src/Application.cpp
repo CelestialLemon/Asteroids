@@ -181,6 +181,8 @@ Scene Application::StartMenuScene() {
 // Settings Scene
 // when increaser or reducer is held down the value of master volume changes by this value per second
 const float VOLUME_CHANGE_SPEED = 0.1f;
+// if button is held down, tick sound will play after this interval in seconds
+const float SETTINGS_TICK_SOUND_INTERVAL = 0.1f;
 
 Scene Application::SettingsScene() {
 
@@ -242,6 +244,33 @@ Scene Application::SettingsScene() {
     text_goBackButton.SetLetterSpacing(1.0f);
     text_goBackButton.SetPosition(sf::Vector2f(360.0f, 600));
 
+    // audio
+    sf::SoundBuffer soundBuffer_tick;
+    soundBuffer_tick.loadFromFile("./res/audio/sfx/WoodBlock1.wav");
+    sf::Sound sound_tick(soundBuffer_tick);
+    // lambda that plays the tick sound for ui
+    // if the sound is not playing play it
+    // if it's playing dont play it until the given interval passes
+    // playing the sound on every frame messes things up so we play it after interval
+    
+    // capture the sound for tick by reference
+    auto play_tick = [&sound_tick]() {
+
+        switch(sound_tick.getStatus()) {
+            // sound is stopped
+            case 0:
+                sound_tick.play();
+                break;
+            // sound is already playing
+            case 2:
+                if(sound_tick.getPlayingOffset() >= sf::seconds(SETTINGS_TICK_SOUND_INTERVAL)) {
+                    sound_tick.stop();
+                    sound_tick.play();
+                }
+            break; 
+        }
+    };
+
     // render loop
 
     sf::Clock clock;
@@ -264,31 +293,37 @@ Scene Application::SettingsScene() {
             // reduce master volume button
             if(text_masterVolumeReducer.GetGlobalBounds().contains((sf::Vector2f)mp)) {
                 MASTER_VOLUME -= VOLUME_CHANGE_SPEED * dt;
+                play_tick();
             }
 
             // increase master volume button
             else if(text_masterVolumeIncreaser.GetGlobalBounds().contains((sf::Vector2f)mp)) {
                 MASTER_VOLUME += VOLUME_CHANGE_SPEED * dt;
+                play_tick();
             }
 
             // reduce sfx volume button
             else if(text_sfxVolumeReducer.GetGlobalBounds().contains((sf::Vector2f)mp)) {
                 SFX_VOLUME -= VOLUME_CHANGE_SPEED * dt;
+                play_tick();
             }
 
             // increase sfx volume button
             else if(text_sfxVolumeIncreaser.GetGlobalBounds().contains((sf::Vector2f)mp)) {
                 SFX_VOLUME += VOLUME_CHANGE_SPEED * dt;
+                play_tick();
             }
 
             // reduce music volume button
             else if(text_musicVolumeReducer.GetGlobalBounds().contains((sf::Vector2f)mp)) {
                 MUSIC_VOLUME -= VOLUME_CHANGE_SPEED * dt;
+                play_tick();
             }
 
             // increase music volume button
             else if(text_musicVolumeIncreaser.GetGlobalBounds().contains((sf::Vector2f)mp)) {
                 MUSIC_VOLUME += VOLUME_CHANGE_SPEED * dt;
+                play_tick();
             }
 
             // go back to start menu button
@@ -305,6 +340,9 @@ Scene Application::SettingsScene() {
         }
 
         // updates
+
+        // update tick volume to we can hear the volume changes in real time
+        sound_tick.setVolume(100.0f * MASTER_VOLUME * SFX_VOLUME);
         
         // update strings for value texts
         text_masterVolumeValue.SetString(to_string_with_precision(MASTER_VOLUME));
