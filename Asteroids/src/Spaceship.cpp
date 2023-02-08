@@ -30,6 +30,15 @@ Spaceship::Spaceship()
     sound_fire.setBuffer(soundBuffer_fire);
 }
 
+Spaceship::~Spaceship() {
+    // release memory for manually allocated bullets
+    for(Bullet* b : m_bullets) {
+        delete b;
+    }
+    // clear bullets set
+    m_bullets.clear();
+}
+
 void Spaceship::SetVolumes(const float MASTER_VOLUME, const float SFX_VOLUME, const float MUSIC_VOLUME) {
     // set music and sfx volumes
     sound_fire.setVolume(100.0f * MASTER_VOLUME * SFX_VOLUME);
