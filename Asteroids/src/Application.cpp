@@ -553,6 +553,14 @@ Scene Application::GameplayScene() {
         if(player.AsteroidSpaceshipCollision(asteroids)) {
             // TODO: add a small wait so this sound effect can play
             sound_death.play();
+
+            // release memory allocated for asteroids before leaving
+            for(Asteroid* ast : asteroids) {
+                delete ast;
+            }
+            asteroids.clear();
+            
+            // change scene to game over
             return Scene::GAME_OVER_SCENE;
         }
         // score should show on top of everything so render last

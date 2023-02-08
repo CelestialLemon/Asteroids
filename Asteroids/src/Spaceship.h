@@ -42,7 +42,10 @@ class Spaceship : public Sprite {
     void Fire();
 
     public:
+    // constructor
     Spaceship();
+    // destructor
+    ~Spaceship();
 
     void AsteroidBulletCollision(const std::unordered_set<Asteroid*>& asteroids);
 
